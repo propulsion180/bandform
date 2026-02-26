@@ -1,4 +1,4 @@
-package com.propulsion180.bandform_backend;
+package com.propulsion180.bandform_backend.data;
 
 import java.util.ArrayList;
 
