@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 import com.propulsion180.bandform_backend.data.User;
 import com.propulsion180.bandform_backend.repositories.UserRepository;
 
+import java.util.ArrayList;
+
+import java.util.List;
+
 @Service
 public class UserService {
 	private final UserRepository userRepository;
@@ -23,8 +27,10 @@ public class UserService {
 		return userRepository.findById(id).orElse(null);
 	}
 
-	public User createUser(CreateUserInput input) {
-		User user = new User();
+	public User createUser(String fName, String lName, String city, String country, String desc,
+			ArrayList<String> instrucments) {
+		User user = new User(fName, lName, city, country, desc, instrucments);
+		return userRepository.save(user);
 
 	}
 }
