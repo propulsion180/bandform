@@ -1,4 +1,4 @@
-package com.propulsion180.bandform_backend;
+package xyz.wmmp.bandform_backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

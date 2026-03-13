@@ -1,0 +1,33 @@
+package xyz.wmmp.bandform_backend;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import xyz.wmmp.bandform_backend.data.User;
+
+import java.util.ArrayList;
+
+
+@SpringBootApplication
+public class BandformBackendApplication {
+
+	private static final Logger log = LoggerFactory.getLogger(BandformBackendApplication.class);
+
+	public static void main(String[] args) {
+		SpringApplication.run(BandformBackendApplication.class, args);
+
+
+	}
+
+	@Bean
+	CommandLineRunner runner(){
+		return args -> {
+			User user = new User(1, "Dietz Nutz", "Denver", "Colorado", "They are meat nutz", new ArrayList<>());
+			log.info("User:" + user);
+		};
+	}
+
+}
