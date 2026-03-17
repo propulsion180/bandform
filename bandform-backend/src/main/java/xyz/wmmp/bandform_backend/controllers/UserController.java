@@ -1,9 +1,11 @@
 package xyz.wmmp.bandform_backend.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import xyz.wmmp.bandform_backend.data.User;
+import xyz.wmmp.bandform_backend.exceptions.UserNotFoundException;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
 
 import java.util.List;
@@ -29,7 +31,7 @@ public class UserController {
 
         Optional<User> user = userRepo.findById(id);
         if(user.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new UserNotFoundException();
         }
         return user.get();
     }
@@ -37,13 +39,13 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
-    void create(@RequestBody User user){
+    void create(@Valid @RequestBody User user){
         userRepo.create(user);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{id}")
-    void update(@RequestBody User user, @PathVariable Integer id){
+    void update(@Valid @RequestBody User user, @PathVariable Integer id){
         userRepo.update(user, id);
     }
 
