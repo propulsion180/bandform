@@ -10,4 +10,5 @@ public record User(Integer id,
                    @NotEmpty @NotBlank String city,
                    @NotEmpty @NotBlank String country,
                    @NotEmpty String description,
+                   List<String> genres,
                    List<String> instruments) {}

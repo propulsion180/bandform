@@ -21,13 +21,4 @@ public class BandformBackendApplication {
 
 
 	}
-
-	@Bean
-	CommandLineRunner runner(){
-		return args -> {
-			User user = new User(1, "Dietz Nutz", "Denver", "Colorado", "They are meat nutz", new ArrayList<>());
-			log.info("User:" + user);
-		};
-	}
-
 }

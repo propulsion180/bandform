@@ -5,6 +5,9 @@ PUT http://localhost:8080/data/users/3
 	"city": "lucknow",
 	"country": "india",
 	"description": "Sufi Poet",
+	"genres": [
+		"Qawwali"
+	]
 	"instruments": [
 		"Sitar",
 		"Tabla"
