@@ -8,6 +8,7 @@ import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
+import xyz.wmmp.bandform_backend.data.JoinRequest;
 import xyz.wmmp.bandform_backend.data.User;
 
 import java.util.*;
@@ -15,7 +16,7 @@ import java.util.*;
 import static java.util.stream.Collectors.toList;
 
 
-public interface UserRepository extends JpaRepository<User, Long>{
+public interface JoinRequestRepository extends JpaRepository<JoinRequest, Long>{
 
 }
 

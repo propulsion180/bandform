@@ -1,0 +1,84 @@
+type Query {
+    users: [User!]!
+    user(id: ID!): User
+}
+
+type Mutation {
+    createUser(
+        name: String!,
+        city: String!,
+        country: String!,
+        description: String!,
+        genres: [String!]!,
+        instruments: [String!]!
+    ): User!
+}
+
+type User {
+    id: ID!,
+    name: String!,
+    city: String,
+    country: String,
+    description: String,
+    genres: [Genre]!
+    instruments: [Instrument]!
+    bandMemberships: [BandMember]!
+}
+
+type Band {
+    id: ID!,
+    name: String!,
+    description: String,
+    city: String,
+    country: String,
+    genres: [Genre]!,
+    members: [BandMember]!,
+    openPositions: [BandPosition]!,
+    joinRequests: [JoinRequest]!,
+
+}
+
+type Genre {
+    id: ID!,
+    name: String
+}
+
+type Instrument {
+    id: ID!,
+    name: String
+}
+
+type BandMember {
+    id: ID!,
+    user: User!,
+    band: Band!,
+    instruments: [Instrument],
+    joinedDate: String!,
+    role: String
+}
+
+type BandPositon{
+    id: ID!,
+    band: Band!,
+    instrument: Instrument!,
+    description: String,
+    filled: Boolean!,
+    filledBy: User
+}
+
+type JoinRequest{
+    id: ID!,
+    user: User!,
+    band: Band!,
+    position: BandPosition,
+    interestedInstruments: [Instrument]!,
+    message: String,
+    requestedDate: String,
+    status: RequestStatus!
+}
+
+type enum RequestStatus{
+    PENDING,
+    ACCEPTED,
+    REJECTED
+}
