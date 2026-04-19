@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.apollographql.apollo").version("4.4.3")
 }
 
 android {
@@ -55,4 +56,20 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation("com.apollographql.apollo:apollo-runtime:4.4.3")
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+//
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+}
+
+apollo{
+    service("serviceName"){
+        packageName.set("xyz.wmmp.bandform")
+        schemaFile.set(file("src/main/graphql/schema.graphqls"))
+    }
 }

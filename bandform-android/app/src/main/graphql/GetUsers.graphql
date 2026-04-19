@@ -1,0 +1,14 @@
+query GetUsers{
+    users{
+        id
+        name
+        city
+        country
+        instruments {
+            name
+        }
+        genres {
+            name
+        }
+    }
+}
