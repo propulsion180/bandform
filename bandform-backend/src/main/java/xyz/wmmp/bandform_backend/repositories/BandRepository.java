@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import xyz.wmmp.bandform_backend.data.Band;
 import xyz.wmmp.bandform_backend.data.User;
-import xyz.wmmp.bandform_backend.exceptions.UserNotFoundException;
 
 import java.util.*;
 
