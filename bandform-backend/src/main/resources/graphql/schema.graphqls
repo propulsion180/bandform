@@ -17,6 +17,7 @@ type Instrument {
 type User {
     id: ID!
     name: String!
+    age: Int!
     city: String
     country: String
     description: String
@@ -76,10 +77,13 @@ type Query {
 type Mutation {
     createUser(
         name: String!
+        age: Int!
         city: String!
         country: String!
         description: String!
         genres: [String!]!
         instruments: [String!]!
     ): User!
+
+    deleteUser(id: ID!): Boolean
 }

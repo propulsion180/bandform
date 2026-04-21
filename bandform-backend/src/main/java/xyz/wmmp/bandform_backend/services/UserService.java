@@ -1,5 +1,7 @@
 package xyz.wmmp.bandform_backend.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.wmmp.bandform_backend.data.Genre;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final GenreRepository genreRepository;
     private final InstrumentRepository instrumentRepository;
@@ -28,16 +31,26 @@ public class UserService {
     }
 
     public List<User> getAllUsers(){
+        log.debug("All users requested");
         return userRepository.findAll();
     }
 
     public User getUserById(Long id){
+        log.debug("User with id: {}, being retrieved");
         return userRepository.findById(id).orElse(null);
     }
 
-    public User createUser(String name, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
+    public boolean deleteUser(Long id){
+        log.debug("Deleting user with id: {}", id);
+        userRepository.deleteById(id);
+        log.debug("Deleted!!");
+        return true;
+    }
+
+    public User createUser(String name, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
         User u = new User();
         u.setName(name);
+        u.setAge(age);
         u.setCity(city);
         u.setCountry(country);
         u.setDescription(desc);

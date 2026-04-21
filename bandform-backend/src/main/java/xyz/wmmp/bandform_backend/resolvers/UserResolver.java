@@ -34,12 +34,18 @@ public class UserResolver{
     @MutationMapping
     public User createUser(
             @Argument String name,
+            @Argument Integer age,
             @Argument String city,
             @Argument String country,
             @Argument String description,
             @Argument List<String> genres,
             @Argument List<String> instruments
     ){
-        return userService.createUser(name, city, country, description, genres, instruments);
+        return userService.createUser(name, age, city, country, description, genres, instruments);
+    }
+
+    @MutationMapping
+    public Boolean deleteUser(@Argument Long id){
+        return userService.deleteUser(id);
     }
 }

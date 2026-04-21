@@ -27,6 +27,10 @@ public class User {
         @Column(nullable = false)
         private String name;
 
+        @NotNull
+        @Column(nullable = false)
+        private Integer age;
+
         @NotEmpty
         @NotBlank
         private String city;
