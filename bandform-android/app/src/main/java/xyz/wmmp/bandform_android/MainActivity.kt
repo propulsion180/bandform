@@ -10,14 +10,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import com.apollographql.apollo.ApolloClient
 import kotlinx.coroutines.launch
+import okhttp3.internal.connection.Exchange
 import xyz.wmmp.bandform.GetUsersQuery
 import xyz.wmmp.bandform.type.User
 import xyz.wmmp.bandform_android.ui.theme.BandformandroidTheme
+import kotlin.math.log
 
 class MainActivity : ComponentActivity() {
 
@@ -38,8 +45,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             BandformandroidTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = x,
+                    ApolloQuery(
+                        apolloClient = apolloClient,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -54,6 +61,31 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         text = "Hello $name!",
         modifier = modifier
     )
+}
+
+@Composable
+fun ApolloQuery(apolloClient: ApolloClient, modifier: Modifier ){
+    var toWrite by remember { mutableStateOf("Loading ...") }
+
+    LaunchedEffect(Unit) {
+        try {
+            var result = apolloClient.query(GetUsersQuery()).execute()
+
+            if (result.data != null) {
+                toWrite = (result.data as Any).toString()
+            } else {
+                Log.d("apollo", "data was empty")
+            }
+        } catch (e: Exception) {
+            Log.d("apollo", "query failed to run?")
+        }
+    }
+
+    Text(
+        text = toWrite,
+        modifier = modifier
+    )
+
 }
 
 
