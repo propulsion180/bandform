@@ -24,14 +24,16 @@ public class UserService {
     private final InstrumentRepository instrumentRepository;
     private final GenreService genreService;
     private final InstrumentService instrumentService;
+    private final BandMemberService bandMemberService;
 
     @Autowired
-    public UserService(UserRepository userRepository, GenreRepository genreRepository, InstrumentRepository instrumentRepository, GenreService genreService, InstrumentService instrumentService){
+    public UserService(UserRepository userRepository, GenreRepository genreRepository, InstrumentRepository instrumentRepository, GenreService genreService, InstrumentService instrumentService, BandMemberService bandMemberService){
         this.userRepository = userRepository;
         this.genreRepository = genreRepository;
         this.instrumentRepository = instrumentRepository;
         this.genreService = genreService;
         this.instrumentService = instrumentService;
+        this.bandMemberService = bandMemberService;
     }
 
     public List<User> getAllUsers(){
@@ -46,6 +48,7 @@ public class UserService {
 
     public boolean deleteUser(Long id){
         log.debug("Deleting user with id: {}", id);
+        bandMemberService.clearAllUserMemberShips(id);
         userRepository.deleteById(id);
         log.debug("Deleted!!");
         return true;

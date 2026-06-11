@@ -18,6 +18,8 @@ import static java.util.stream.Collectors.toList;
 
 public interface BandMemberRepository extends JpaRepository<BandMember, Long>{
     Optional<List<BandMember>> findByBandNameIn(Long band_id);
+
+    Optional<List<BandMember>> findByUserNameIn(Long user_id);
 }
 
 //@Repository
