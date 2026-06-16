@@ -25,6 +25,10 @@ public class BandPositionService {
         this.bandPositionRepository = bandPositionRepository;
     }
 
+    public BandPosition getBandPositionById(Long bPId){
+        return bandPositionRepository.findById(bPId).orElse(null);
+    }
+
     public BandPosition createBandPosition(Long bandId, String instrumentName, String description){
         Band b = bandService.getBandById(bandId);
         Instrument i = instrumentService.getInstrumentsByNameAndAddIfNecessary(List.of(instrumentName)).getFirst();
@@ -47,6 +51,18 @@ public class BandPositionService {
         //needs logging.
     }
 
-   //add update serivce
+   public boolean updateBandPosition(Long bpId, Band band,  String instrument, String description, boolean filled, User filler){
+        BandPosition bp = bandPositionRepository.findById(bpId).orElse(null);
+        if(bp == null){return false;}
+
+        if(band != null && band != null){bp.setBand(band);}
+        if(instrument != null && !instrument.isBlank()){bp.setInstrument(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrument));}
+        if(description != null && !description.isBlank()){bp.setDescription(description);}
+        bp.setFilled(filled);
+        if(filler != null && !filler.equals(bp.getFilledBy())){bp.setFilledBy(filler);}
+        bandPositionRepository.save(bp);
+        return true;
+        //this kinda sucks. why returning true?
+   }
 
 }

@@ -42,7 +42,7 @@ public class BandService {
         return bandRepository.findById(id).orElse(null);
     }
 
-    public Boolean deleteUser(Long id){
+    public Boolean deleteBand(Long id){
         log.debug("Deleting band with id: {}", id);
         bandRepository.deleteById(id);
         log.debug("Deleted!!");

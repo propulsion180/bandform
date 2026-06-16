@@ -72,6 +72,8 @@ type JoinRequest{
 type Query {
     users: [User!]!
     user(id: ID!): User
+    bands: [Band!]!
+    band(id: ID!): Band
 }
 
 type Mutation {
@@ -85,5 +87,37 @@ type Mutation {
         instruments: [String!]!
     ): User!
 
+    updateUser(
+        id: ID!,
+        name: String
+        age: Int
+        city: String
+        country: String
+        description: String
+        genres: [String!]
+        instruments: [String!]
+    ): User!
+
     deleteUser(id: ID!): Boolean
+
+    createBand(
+        name: String!
+        description: String!
+        city: String!
+        country: String!
+        genres: [String!]!
+    ): Band!
+
+    updateBand(
+        id: ID!
+        name: String
+        description: String
+        city: String
+        country: String
+        genres: [String!]
+    ): Band!
+
+    deleteBand(id: ID!): Boolean
+
+
 }

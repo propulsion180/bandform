@@ -45,6 +45,20 @@ public class UserResolver{
     }
 
     @MutationMapping
+    public Boolean updateUser(
+            @Argument Long id,
+            @Argument String name,
+            @Argument Integer age,
+            @Argument String city,
+            @Argument String country,
+            @Argument String description,
+            @Argument List<String> genres,
+            @Argument List<String> instruments
+    ){
+        return userService.updateUser(id, name, age, city, country, description, genres, instruments);
+    }
+
+    @MutationMapping
     public Boolean deleteUser(@Argument Long id){
         return userService.deleteUser(id);
     }

@@ -33,7 +33,7 @@ public class BandMemberService {
         return bandMemberRepository.findByBandNameIn(bandId).orElse(null);
     }
 
-    public BandMember addMemberToBand(Long bandId, Long userId, List<String> instrumentNames, String role){
+    public BandMember createBandMember(Long bandId, Long userId, List<String> instrumentNames, String role){
         BandMember bm = new BandMember();
         User u = userRepository.findById(userId).orElse(null);
         bm.setUser(u);
