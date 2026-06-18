@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toList;
 
 
 public interface BandPositionRepository extends JpaRepository<BandPosition, Long>{
-    Optional<List<BandMember>> findByUserIDIn(Long user_id);
+    Optional<List<BandPosition>> findByBandId(Long band_id);
 }
 
 //@Repository

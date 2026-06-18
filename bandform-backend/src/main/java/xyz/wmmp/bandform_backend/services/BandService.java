@@ -42,11 +42,11 @@ public class BandService {
         return bandRepository.findById(id).orElse(null);
     }
 
-    public Boolean deleteBand(Long id){
+    public Long deleteBand(Long id){
         log.debug("Deleting band with id: {}", id);
         bandRepository.deleteById(id);
         log.debug("Deleted!!");
-        return true;
+        return id;
     }
 
     public Band createBand(String name, String desc, String city, String country, List<String> genreNames){
@@ -78,9 +78,9 @@ public class BandService {
         return bandRepository.save(b);
     }
 
-    public Boolean updateBand(Long id, String name, String desc, String city, String country, List<String> genreNames){
+    public Long updateBand(Long id, String name, String desc, String city, String country, List<String> genreNames){
         Band b = bandRepository.findById(id).orElse(null);
-        if(b == null){return false;}
+        if(b == null){return null;}
 
         if(name != null && !name.isBlank()){b.setName(name);}
         if(desc != null && !desc.isBlank()){b.setDescription(desc);}
@@ -89,7 +89,7 @@ public class BandService {
         if(genreNames != null && !genreNames.isEmpty()){b.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));}
 
         bandRepository.save(b);
-        return true;
+        return id;
     }
 
 

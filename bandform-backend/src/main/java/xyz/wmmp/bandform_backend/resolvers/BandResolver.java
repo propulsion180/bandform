@@ -33,11 +33,11 @@ public class BandResolver {
             @Argument String country,
             @Argument List<String> genres
     ){
-        return bandService.createBand(nam, description, city, country, genres);
+        return bandService.createBand(name, description, city, country, genres);
     }
 
     @MutationMapping
-    public Boolean updateBand(
+    public Long updateBand(
             @Argument Long id,
             @Argument String name,
             @Argument String description,
@@ -46,6 +46,13 @@ public class BandResolver {
             @Argument List<String> genres
     ){
         return bandService.updateBand(id, name, description, city, country, genres);
+    }
+
+    @MutationMapping
+    public Long deleteBand(
+            @Argument Long id
+    ){
+        return bandService.deleteBand(id);
     }
 
 }

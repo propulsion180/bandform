@@ -46,12 +46,12 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
-    public boolean deleteUser(Long id){
+    public Long deleteUser(Long id){
         log.debug("Deleting user with id: {}", id);
         bandMemberService.clearAllUserMemberShips(id);
         userRepository.deleteById(id);
         log.debug("Deleted!!");
-        return true;
+        return id;
     }
 
     public User createUser(String name, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
@@ -67,9 +67,9 @@ public class UserService {
         return userRepository.save(u);
     }
 
-    public boolean updateUser(Long id, String name, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
+    public Long updateUser(Long id, String name, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
        User u = userRepository.findById(id).orElse(null);
-       if(u == null){return false;}
+       if(u == null){return null;}
 
        if(name != null && !name.isBlank()){u.setName(name);}
        if(age != null){u.setAge(age);}
@@ -80,7 +80,7 @@ public class UserService {
        if(instrumentNames != null && !instrumentNames.isEmpty()){u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));}
 
        userRepository.save(u);
-       return true;
+       return id;
     }
 
 }

@@ -74,6 +74,8 @@ type Query {
     user(id: ID!): User
     bands: [Band!]!
     band(id: ID!): Band
+    bandPositions(id: ID!): BandPosition
+    positionsInBand(bId: ID!): [BandPosition!]
 }
 
 type Mutation {
@@ -96,9 +98,9 @@ type Mutation {
         description: String
         genres: [String!]
         instruments: [String!]
-    ): User!
+    ): ID
 
-    deleteUser(id: ID!): Boolean
+    deleteUser(id: ID!): ID
 
     createBand(
         name: String!
@@ -115,9 +117,25 @@ type Mutation {
         city: String
         country: String
         genres: [String!]
-    ): Band!
+    ): ID
 
-    deleteBand(id: ID!): Boolean
+    deleteBand(id: ID!): ID
 
+    createBandPosition(
+        bandId: ID!
+        instrumentName: String!
+        description: String!
+    ): BandPosition
+
+    updateBandPosition(
+        bpId: ID!
+        bId: ID
+        instrument: String
+        description: String
+        filled: Boolean
+        fillerId: ID
+    ): ID
+
+    deleteBandPosition(pbId: ID!): ID
 
 }

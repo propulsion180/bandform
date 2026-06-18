@@ -29,6 +29,10 @@ public class BandPositionService {
         return bandPositionRepository.findById(bPId).orElse(null);
     }
 
+    public List<BandPosition> getBandPositionsInBand(Long bId){
+        return bandPositionRepository.findByBandId(bId).orElse(null);
+    }
+
     public BandPosition createBandPosition(Long bandId, String instrumentName, String description){
         Band b = bandService.getBandById(bandId);
         Instrument i = instrumentService.getInstrumentsByNameAndAddIfNecessary(List.of(instrumentName)).getFirst();
@@ -40,29 +44,24 @@ public class BandPositionService {
         return bandPositionRepository.save(bp);
     }
 
-    public boolean clearUsersBandPositions(Long userid){
-        List<BandPosition> bps = bandPositionRepository.findByUserIDIn(userid).orElse(null);
 
-        if(bps == null){return false;}
-
-        bandPositionRepository.deleteAll(bps);
-        return true;
-
-        //needs logging.
-    }
-
-   public boolean updateBandPosition(Long bpId, Band band,  String instrument, String description, boolean filled, User filler){
+   public Long updateBandPosition(Long bpId, Band band,  String instrument, String description, boolean filled, User filler){
         BandPosition bp = bandPositionRepository.findById(bpId).orElse(null);
-        if(bp == null){return false;}
+        if(bp == null){return null;}
 
         if(band != null && band != null){bp.setBand(band);}
-        if(instrument != null && !instrument.isBlank()){bp.setInstrument(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrument));}
+        if(instrument != null && !instrument.isBlank()){bp.setInstrument(instrumentService.getInstrumentsByNameAndAddIfNecessary(List.of(instrument)).getFirst());}
         if(description != null && !description.isBlank()){bp.setDescription(description);}
         bp.setFilled(filled);
         if(filler != null && !filler.equals(bp.getFilledBy())){bp.setFilledBy(filler);}
         bandPositionRepository.save(bp);
-        return true;
+        return bpId;
         //this kinda sucks. why returning true?
+   }
+
+   public Long deleteBandPosition(Long bpId){
+        bandPositionRepository.deleteById(bpId);
+        return bpId;
    }
 
 }

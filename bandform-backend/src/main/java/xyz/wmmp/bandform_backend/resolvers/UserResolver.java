@@ -45,7 +45,7 @@ public class UserResolver{
     }
 
     @MutationMapping
-    public Boolean updateUser(
+    public Long updateUser(
             @Argument Long id,
             @Argument String name,
             @Argument Integer age,
@@ -59,7 +59,7 @@ public class UserResolver{
     }
 
     @MutationMapping
-    public Boolean deleteUser(@Argument Long id){
-        return userService.deleteUser(id);
+    public Long deleteUser(@Argument Long id){
+         return userService.deleteUser(id);
     }
 }
