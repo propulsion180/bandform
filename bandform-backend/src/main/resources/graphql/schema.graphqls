@@ -76,6 +76,10 @@ type Query {
     band(id: ID!): Band
     bandPositions(id: ID!): BandPosition
     positionsInBand(bId: ID!): [BandPosition!]
+    membersInBand(bID: ID!): [BandMember!]
+    joinRequest(id: ID!): JoinRequest
+    userJoinRequests(uID: ID!): [JoinRequest!]
+    bandJoinRequests(bID: ID!): [JoinRequest!]
 }
 
 type Mutation {
@@ -138,4 +142,26 @@ type Mutation {
 
     deleteBandPosition(pbId: ID!): ID
 
+    createBandMember(
+        bID: ID!
+        uID: ID!
+        instrumentNames: [String]
+        role: String
+    ): BandMember
+
+    deleteBandMember(bmID: ID!): ID
+
+    createJoinRequest(
+        uID: ID!
+        bID: ID!
+        bpID: ID!
+        interestedInstruments: [String!]
+        message: String
+    ): JoinRequest
+
+    deleteJoinRequest(id: ID): ID
+
+    reject(id: ID!): ID
+
+    accept(id: ID!): ID
 }

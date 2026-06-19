@@ -1,5 +1,6 @@
 package xyz.wmmp.bandform_backend.services;
 
+import org.hibernate.mapping.Join;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.wmmp.bandform_backend.data.BandPosition;
@@ -32,13 +33,21 @@ public class JoinRequestService {
         return joinRequestRepository.findAll();
     }
 
+    public List<JoinRequest> getUserJoinRequests(Long uID){
+        return joinRequestRepository.findByUserId(uID);
+    }
+
+    public List<JoinRequest> getBandJoinRequests(Long bID){
+        return joinRequestRepository.findByBandId(bID);
+    }
+
     public JoinRequest getJoinRequestById(Long id){
         return joinRequestRepository.findById(id).orElse(null);
     }
 
-    public boolean deleteJoinRequestById(Long id){
+    public Long deleteJoinRequestById(Long id){
         joinRequestRepository.deleteById(id);
-        return true;
+        return id;
         //find a better options rather than boolean.
     }
 
@@ -53,20 +62,22 @@ public class JoinRequestService {
         return joinRequestRepository.save(jr);
     }
 
-    public void reject(Long jRID){
+    public Long reject(Long jRID){
         JoinRequest jr = joinRequestRepository.findById(jRID).orElse(null);
         if(jr == null){/*log stuff*/ }
         jr.setStatus(RequestStatus.REJECTED);
         joinRequestRepository.save(jr);
-        // notify hook for notifications
+        return jRID;// notify hook for notifications
     }
 
-    public void accept(Long jRID){
+    public Long accept(Long jRID){
         JoinRequest jr = joinRequestRepository.findById(jRID).orElse(null);
         if(jr == null){/*log stuff*/ }
         jr.setStatus(RequestStatus.ACCEPTED);
         joinRequestRepository.save(jr);
-        // notify hook for notifications
+
+        //create bandmember and add to band
+        return jRID;// notify hook for notifications
     }
 
 

@@ -46,19 +46,9 @@ public class BandMemberService {
         return bandMemberRepository.save(bm);
     }
 
-    public boolean removeMember(Long memberId){
+    public Long removeMember(Long memberId){
         bandMemberRepository.deleteById(memberId);
-        return true;
+        return memberId;
     }
-
-    public boolean clearAllUserMemberShips(Long userId){
-        List<BandMember> memberships = bandMemberRepository.findByUserNameIn(userId).orElse(null);
-        if(memberships == null){return false;} //add logging.
-
-        bandMemberRepository.deleteAll(memberships);
-        return true;
-    }
-
-
 
 }

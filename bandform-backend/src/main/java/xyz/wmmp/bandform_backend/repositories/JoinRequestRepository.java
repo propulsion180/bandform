@@ -17,7 +17,8 @@ import static java.util.stream.Collectors.toList;
 
 
 public interface JoinRequestRepository extends JpaRepository<JoinRequest, Long>{
-
+    List<JoinRequest> findByUserId(Long user_id);
+    List<JoinRequest> findByBandId(Long band_id);
 }
 
 //@Repository
