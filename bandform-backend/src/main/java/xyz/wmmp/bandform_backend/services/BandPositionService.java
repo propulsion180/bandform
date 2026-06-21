@@ -40,8 +40,10 @@ public class BandPositionService {
         bp.setBand(b);
         bp.setInstrument(i);
         bp.setDescription(description);
-
-        return bandPositionRepository.save(bp);
+        bp = bandPositionRepository.save(bp);
+        List<BandPosition> toUpdate = b.getOpenPositions();
+        bandService.updateBand(b.getId(), null, null, null, null, null, null , toUpdate, null);
+        return bp;
     }
 
 
@@ -59,7 +61,13 @@ public class BandPositionService {
         //this kinda sucks. why returning true?
    }
 
-   public Long deleteBandPosition(Long bpId){
+   public Long deleteBandPosition(Long bpId){ //should not need this after first setup.
+        BandPosition bp = bandPositionRepository.findById(bpId).orElse(null);
+        if(bp == null){return null;}
+        Band b = bp.getBand();
+        List<BandPosition> toUpdate = b.getOpenPositions();
+        toUpdate.remove(bp);
+        bandService.updateBand(b.getId(), null, null, null, null, null, null , toUpdate, null);
         bandPositionRepository.deleteById(bpId);
         return bpId;
    }

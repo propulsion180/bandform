@@ -53,4 +53,5 @@ public class Band{
     @OneToMany(mappedBy = "band", cascade = CascadeType.ALL)
     private List<JoinRequest> joinRequests = new ArrayList<>();
 
+
 }

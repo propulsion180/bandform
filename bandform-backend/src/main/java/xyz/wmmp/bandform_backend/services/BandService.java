@@ -4,9 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import xyz.wmmp.bandform_backend.data.Band;
-import xyz.wmmp.bandform_backend.data.BandPosition;
-import xyz.wmmp.bandform_backend.data.Genre;
+import xyz.wmmp.bandform_backend.data.*;
 import xyz.wmmp.bandform_backend.repositories.BandPositionRepository;
 import xyz.wmmp.bandform_backend.repositories.BandRepository;
 import xyz.wmmp.bandform_backend.repositories.GenreRepository;
@@ -78,7 +76,7 @@ public class BandService {
         return bandRepository.save(b);
     }
 
-    public Long updateBand(Long id, String name, String desc, String city, String country, List<String> genreNames){
+    public Long updateBand(Long id, String name, String desc, String city, String country, List<String> genreNames, List<BandMember> members, List<BandPosition> openPositions, List<JoinRequest> joinRequests){
         Band b = bandRepository.findById(id).orElse(null);
         if(b == null){return null;}
 
@@ -87,6 +85,9 @@ public class BandService {
         if(city != null && !city.isBlank()){b.setCity(city);}
         if(country != null && !country.isBlank()){b.setCountry(country);}
         if(genreNames != null && !genreNames.isEmpty()){b.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));}
+        if(members != null && !members.isEmpty()){b.setMembers(members);}
+        if(openPositions != null && !openPositions.isEmpty()){b.setOpenPositions(openPositions);}
+        if(joinRequests != null && !joinRequests.isEmpty()){b.setJoinRequests(joinRequests);}
 
         bandRepository.save(b);
         return id;

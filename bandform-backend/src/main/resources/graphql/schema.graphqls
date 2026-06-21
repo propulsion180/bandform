@@ -163,5 +163,8 @@ type Mutation {
 
     reject(id: ID!): ID
 
-    accept(id: ID!): ID
+    accept(
+        id: ID!
+        bandRole: String!
+    ): ID
 }

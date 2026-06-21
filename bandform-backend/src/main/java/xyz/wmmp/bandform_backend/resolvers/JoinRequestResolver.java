@@ -56,7 +56,7 @@ public class JoinRequestResolver {
     }
 
     @MutationMapping
-    public Long accept(@Argument Long id){
-        return joinRequestService.accept(id);
+    public Long accept(@Argument Long id, @Argument String bandRole){
+        return joinRequestService.accept(id, bandRole);
     }
 }
