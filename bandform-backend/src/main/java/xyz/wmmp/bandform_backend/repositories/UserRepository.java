@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toList;
 
 
 public interface UserRepository extends JpaRepository<User, Long>{
-
+    Optional<User> findByName(String name);
 }
 
 //@Repository

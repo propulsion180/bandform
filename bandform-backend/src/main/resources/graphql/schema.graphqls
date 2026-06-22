@@ -67,6 +67,10 @@ type JoinRequest{
     status: RequestStatus!
 }
 
+type LoginResult {
+    user: User!
+}
+
 
 
 type Query {
@@ -167,4 +171,7 @@ type Mutation {
         id: ID!
         bandRole: String!
     ): ID
+
+    login(name: String!, password: String!): LoginResult!
+    logout: Boolean!
 }

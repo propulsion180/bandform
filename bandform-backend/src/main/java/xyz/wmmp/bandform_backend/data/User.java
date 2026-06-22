@@ -1,5 +1,6 @@
 package xyz.wmmp.bandform_backend.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -8,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,19 @@ public class User {
         @Column(nullable = false)
         private String name;
 
+        @Column(nullable = false)
+        private String email;
+
+        @JsonIgnore
+        @Column(nullable = false)
+        private String passwordHash;
+
+        @JsonIgnore
+        private String jtiToken;
+
+        @JsonIgnore
+        private Instant tokenExpiry;
+
         @NotNull
         @Column(nullable = false)
         private Integer age;
@@ -40,6 +55,9 @@ public class User {
         private String country;
 
         private String description;
+
+        private String role; //Can be USER or ADMIN
+        private boolean locked = false;
 
         @ManyToMany
         @JoinTable(name = "user_genres", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))

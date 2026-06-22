@@ -3,6 +3,7 @@ package xyz.wmmp.bandform_backend.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import xyz.wmmp.bandform_backend.data.Genre;
 import xyz.wmmp.bandform_backend.data.Instrument;
@@ -25,15 +26,17 @@ public class UserService {
     private final GenreService genreService;
     private final InstrumentService instrumentService;
     private final BandMemberService bandMemberService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, GenreRepository genreRepository, InstrumentRepository instrumentRepository, GenreService genreService, InstrumentService instrumentService, BandMemberService bandMemberService){
+    public UserService(UserRepository userRepository, GenreRepository genreRepository, InstrumentRepository instrumentRepository, GenreService genreService, InstrumentService instrumentService, BandMemberService bandMemberService, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
         this.genreRepository = genreRepository;
         this.instrumentRepository = instrumentRepository;
         this.genreService = genreService;
         this.instrumentService = instrumentService;
         this.bandMemberService = bandMemberService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<User> getAllUsers(){
@@ -48,22 +51,25 @@ public class UserService {
 
     public Long deleteUser(Long id){
         log.debug("Deleting user with id: {}", id);
-        bandMemberService.clearAllUserMemberShips(id);
         userRepository.deleteById(id);
         log.debug("Deleted!!");
         return id;
     }
 
-    public User createUser(String name, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
+    public User createUser(String name, String email, String plainPassword, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
         log.debug("Creating user");
+        if(userRepository.findByName(name).isPresent()){ throw new IllegalArgumentException("UserName already taken"); }
         User u = new User();
         u.setName(name);
+        u.setEmail(email);
+        u.setPasswordHash(passwordEncoder.encode(plainPassword));
         u.setAge(age);
         u.setCity(city);
         u.setCountry(country);
         u.setDescription(desc);
         u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));
         u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));
+        u.setRole("USER");
         return userRepository.save(u);
     }
 
