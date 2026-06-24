@@ -34,11 +34,11 @@ public class JoinRequestService {
     }
 
     public List<JoinRequest> getUserJoinRequests(Long uID){
-        return joinRequestRepository.findByUserId(uID);
+        return joinRequestRepository.findByUserId(uID).orElse(null);
     }
 
     public List<JoinRequest> getBandJoinRequests(Long bID){
-        return joinRequestRepository.findByBandId(bID);
+        return joinRequestRepository.findByBandId(bID).orElse(null);
     }
 
     public JoinRequest getJoinRequestById(Long id){

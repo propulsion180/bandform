@@ -45,7 +45,7 @@ public class BandResolver {
             @Argument String country,
             @Argument List<String> genres
     ){
-        return bandService.updateBand(id, name, description, city, country, genres);
+        return bandService.updateBand(id, name, description, city, country, genres, null, null, null);
     }
 
     @MutationMapping

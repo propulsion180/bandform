@@ -80,4 +80,25 @@ public class AuthResolver {
         response.addHeader(HttpHeaders.SET_COOKIE, clear.toString());
         return true;
     }
+
+    @MutationMapping
+    public boolean changePassword(@CookieValue(value = "session", required = false) String token, @Argument String newPassword, HttpServletResponse response){
+        if(newPassword == null || newPassword.isBlank()){ return false; }
+        if (token != null){
+            try{
+                Claims claims = jwtUtil.validate(token);
+                String userId = claims.getSubject();
+                User user = userRepository.findById(Long.getLong(userId)).orElseThrow();
+                user.setJtiToken(null);
+                user.setTokenExpiry(null);
+                user.setPasswordHash(passwordEncoder.encode(newPassword));
+            }catch (JwtException ignored){}
+        }
+
+        ResponseCookie clear = ResponseCookie.from("session", "")
+                .maxAge(0).path("/").build();
+        response.addHeader(HttpHeaders.SET_COOKIE, clear.toString());
+
+        return true;
+    }
 }

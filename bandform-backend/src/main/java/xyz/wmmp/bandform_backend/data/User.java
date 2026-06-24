@@ -56,8 +56,15 @@ public class User {
 
         private String description;
 
+        @NotEmpty
+        @NotBlank
         private String role; //Can be USER or ADMIN
+
         private boolean locked = false;
+
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        private UserStatus status = UserStatus.NOBANDSEL;
 
         @ManyToMany
         @JoinTable(name = "user_genres", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))

@@ -3,11 +3,14 @@ package xyz.wmmp.bandform_backend.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import xyz.wmmp.bandform_backend.data.Genre;
 import xyz.wmmp.bandform_backend.data.Instrument;
 import xyz.wmmp.bandform_backend.data.User;
+import xyz.wmmp.bandform_backend.data.UserProfile;
 import xyz.wmmp.bandform_backend.repositories.GenreRepository;
 import xyz.wmmp.bandform_backend.repositories.InstrumentRepository;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
@@ -39,9 +42,14 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<User> getAllUsers(){
+    public List<UserProfile> getAllUsers(){
         log.debug("All users requested");
-        return userRepository.findAll();
+        return userRepository.findAll().stream().map(UserProfile::from).collect(Collectors.toList());
+    }
+
+    public UserProfile getUserProfileById(Long id){
+        log.debug("User with id: {}, being retrieved", id);
+        return UserProfile.from(userRepository.findById(id).orElse(null));
     }
 
     public User getUserById(Long id){
@@ -56,7 +64,7 @@ public class UserService {
         return id;
     }
 
-    public User createUser(String name, String email, String plainPassword, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
+    public UserProfile createUser(String name, String email, String plainPassword, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
         log.debug("Creating user");
         if(userRepository.findByName(name).isPresent()){ throw new IllegalArgumentException("UserName already taken"); }
         User u = new User();
@@ -70,14 +78,15 @@ public class UserService {
         u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));
         u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));
         u.setRole("USER");
-        return userRepository.save(u);
+        return UserProfile.from(userRepository.save(u));
     }
 
-    public Long updateUser(Long id, String name, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
+    public Long updateUser(Long id, String name, String email, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
        User u = userRepository.findById(id).orElse(null);
        if(u == null){return null;}
 
        if(name != null && !name.isBlank()){u.setName(name);}
+       if(email != null && !email.isBlank()){u.setEmail(email);}
        if(age != null){u.setAge(age);}
        if(city != null && !city.isBlank()){u.setCity(city);}
        if(country != null && !country.isBlank()){u.setCountry(country);}
