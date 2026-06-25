@@ -4,6 +4,15 @@ enum RequestStatus{
     REJECTED
 }
 
+enum UserStatus {
+    NOBANDRAND
+    NOBANDSEL
+    BAND
+    BANDRAND
+    BANDSEL
+}
+
+
 type Genre {
     id: ID!
     name: String
@@ -24,6 +33,7 @@ type User{
     city: String!
     country: String!
     descripition: String!
+    status: UserStatus!
     genres: [Genre]!
     instruments: [Instrument]!
     bandMemberships: [BandMember]!

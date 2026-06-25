@@ -7,6 +7,7 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import xyz.wmmp.bandform_backend.data.User;
 import xyz.wmmp.bandform_backend.data.UserProfile;
+import xyz.wmmp.bandform_backend.data.UserStatus;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
 import xyz.wmmp.bandform_backend.services.UserService;
 
@@ -27,8 +28,8 @@ public class UserResolver{
     }
 
     @QueryMapping
-    public User user(@Argument Long id){
-        return userService.getUserById(id);
+    public UserProfile user(@Argument Long id){
+        return userService.getUserProfileById(id);
     }
 
 
@@ -56,10 +57,11 @@ public class UserResolver{
             @Argument String city,
             @Argument String country,
             @Argument String description,
+            @Argument UserStatus status,
             @Argument List<String> genres,
             @Argument List<String> instruments
     ){
-        return userService.updateUser(id, name, email, age, city, country, description, genres, instruments);
+        return userService.updateUser(id, name, email, age, city, country, description, status, genres, instruments, null);
     }
 
     @MutationMapping

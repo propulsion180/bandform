@@ -7,10 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import xyz.wmmp.bandform_backend.data.Genre;
-import xyz.wmmp.bandform_backend.data.Instrument;
-import xyz.wmmp.bandform_backend.data.User;
-import xyz.wmmp.bandform_backend.data.UserProfile;
+import xyz.wmmp.bandform_backend.data.*;
 import xyz.wmmp.bandform_backend.repositories.GenreRepository;
 import xyz.wmmp.bandform_backend.repositories.InstrumentRepository;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
@@ -81,7 +78,7 @@ public class UserService {
         return UserProfile.from(userRepository.save(u));
     }
 
-    public Long updateUser(Long id, String name, String email, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
+    public Long updateUser(Long id, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships){
        User u = userRepository.findById(id).orElse(null);
        if(u == null){return null;}
 
@@ -91,8 +88,10 @@ public class UserService {
        if(city != null && !city.isBlank()){u.setCity(city);}
        if(country != null && !country.isBlank()){u.setCountry(country);}
        if(desc != null && !desc.isBlank()){u.setDescription(desc);}
-       if(genreNames != null && !genreNames.isEmpty()){u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));}
-       if(instrumentNames != null && !instrumentNames.isEmpty()){u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));}
+       if(status != null){u.setStatus(status);}
+       if(genreNames != null){u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));}
+       if(instrumentNames != null){u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));}
+       if(memberships != null){u.setBandMemberships(memberships);}
 
        userRepository.save(u);
        return id;
