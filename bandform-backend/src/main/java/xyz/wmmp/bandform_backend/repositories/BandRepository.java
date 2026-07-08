@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
@@ -12,7 +13,7 @@ import xyz.wmmp.bandform_backend.data.User;
 
 import java.util.*;
 
-public interface BandRepository extends JpaRepository<Band, Long> {
+public interface BandRepository extends JpaRepository<Band, Long>, JpaSpecificationExecutor<Band> {
 
 }
 //

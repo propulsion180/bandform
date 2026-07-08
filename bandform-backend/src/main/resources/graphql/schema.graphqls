@@ -97,6 +97,7 @@ type Query {
     joinRequest(id: ID!): JoinRequest
     userJoinRequests(uID: ID!): [JoinRequest!]
     bandJoinRequests(bID: ID!): [JoinRequest!]
+#    todo add recommenders
 }
 
 type Mutation {
