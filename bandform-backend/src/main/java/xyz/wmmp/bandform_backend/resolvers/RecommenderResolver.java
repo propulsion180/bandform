@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import xyz.wmmp.bandform_backend.data.*;
 import xyz.wmmp.bandform_backend.repositories.BandRepository;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
+import xyz.wmmp.bandform_backend.services.RankingService;
 import xyz.wmmp.bandform_backend.services.UserService;
 
 import java.util.HashMap;
@@ -24,12 +25,14 @@ public class RecommenderResolver {
 
     private final UserService userService;
     private final BandRepository bandRepository;
-    privat final UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final RankingService rankingService;
 
-    public RecommenderResolver(UserService userService, BandRepository bandRepository, UserRepository userRepository) {
+    public RecommenderResolver(UserService userService, BandRepository bandRepository, UserRepository userRepository, RankingService rankingService) {
         this.userService = userService;
         this.bandRepository = bandRepository;
         this.userRepository = userRepository;
+        this.rankingService = rankingService;
     }
 
     @QueryMapping
@@ -118,71 +121,8 @@ public class RecommenderResolver {
         if(locGenreWeight >= -5 || locGenreWeight <= 5 ){ throw new IllegalArgumentException("weighting cant be more than 5 or less than -5 ");}
 
         Integer locWeight = 5 + locGenreWeight;
-        Integer GenreWeight = 5 - locGenreWeight;
+        Integer genreWeight = 5 - locGenreWeight;
 
-        Band b = bp.getBand();
-
-        Specification<User> spec = Specification.where(null);
-        if(withinCity){
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.and(
-                    criteriaBuilder.equal(root.get("city"), b.getCity())
-            ));
-        }
-
-        if(withinCountry){
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.and(
-                    criteriaBuilder.equal(root.get("country"), b.getCountry())
-            ));
-        }
-
-
-        if(sameGenre){
-            spec = spec.and((root, query, criteriaBuilder) -> {
-                query.distinct(true);
-                return root.join("genres").in(b.getGenres());
-            });
-        }
-
-        Map<User, Double> potUsers = userRepository.findAll(spec).stream().collect(Collectors.toMap(u -> u, u -> 0.0));
-
-        for(User u : potUsers.keySet()){
-            Double score = 0.0;
-
-            if(u.getCountry().equals(b.getCountry())){
-                score += 15.0 * locWeight;
-            }
-
-            if(u.getCity().equals(b.getCity())){
-                score += 15.0 * locWeight;
-            }
-
-            Double genreInc = 25.0 / b.getGenres().size();
-
-            for(Genre g : b.getGenres()){
-                if(u.getGenres().contains(g)){
-                    score += genreInc;
-                }
-                
-            }
-
-            Set<Instrument> bandInstrumentsToCheck = null;
-
-            if(singleInstrument){
-                bandInstrumentsToCheck = Set.of(bp.getInstrument());
-            }else{
-                bandInstrumentsToCheck = b.getOpenPositions().stream().map(pos -> pos.getInstrument()).collect(Collectors.toSet());
-            }
-
-            Double instruIncrement = 25.0 / bandInstrumentsToCheck.size();
-
-            for(Instrument i : u.getInstruments()){
-                if(bandInstrumentsToCheck.contains(i)){
-                    score += instruIncrement;
-                }
-            }
-
-            potUsers.put(u, score);
-        }
-        return potUsers.entrySet().stream().sorted(Map.Entry.<User, Double>comparingByValue().reversed()).map(Map.Entry::getKey).map(u -> UserProfile.from(u)).toList();
+        return rankingService.rankedUsers(bp.getBand(), withinCity, withinCountry, sameGenre, singleInstrument, locWeight, genreWeight).entrySet().stream().sorted(Map.Entry.<User, Double>comparingByValue().reversed()).map(Map.Entry::getKey).map(u -> UserProfile.from(u)).toList();
     }
 }
