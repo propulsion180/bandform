@@ -42,6 +42,19 @@ public class BandPositionService {
         bp.setDescription(description);
         bp = bandPositionRepository.save(bp);
         List<BandPosition> toUpdate = b.getOpenPositions();
+        toUpdate.add(bp);
+        bandService.updateBand(b.getId(), null, null, null, null, null, null , toUpdate, null);
+        return bp;
+    }
+
+    public BandPosition createBandPosition(Band b, Instrument i, String description){
+        BandPosition bp = new BandPosition();
+        bp.setBand(b);
+        bp.setInstrument(i);
+        bp.setDescription(description);
+        bp = bandPositionRepository.save(bp);
+        List<BandPosition> toUpdate = b.getOpenPositions();
+        toUpdate.add(bp);
         bandService.updateBand(b.getId(), null, null, null, null, null, null , toUpdate, null);
         return bp;
     }

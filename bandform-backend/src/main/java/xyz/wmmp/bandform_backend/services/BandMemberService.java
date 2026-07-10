@@ -2,10 +2,7 @@ package xyz.wmmp.bandform_backend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import xyz.wmmp.bandform_backend.data.Band;
-import xyz.wmmp.bandform_backend.data.BandMember;
-import xyz.wmmp.bandform_backend.data.Instrument;
-import xyz.wmmp.bandform_backend.data.User;
+import xyz.wmmp.bandform_backend.data.*;
 import xyz.wmmp.bandform_backend.repositories.BandMemberRepository;
 import xyz.wmmp.bandform_backend.repositories.BandRepository;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
@@ -52,6 +49,7 @@ public class BandMemberService {
     public BandMember createBandMember(Long bandId, Long userId, List<String> instrumentNames, String role){
         BandMember bm = new BandMember();
         User u = userRepository.findById(userId).orElse(null);
+        u.setStatus(UserStatus.BAND);
         bm.setUser(u);
         Band b = bandService.getBandById(bandId);
         bm.setBand(b);
