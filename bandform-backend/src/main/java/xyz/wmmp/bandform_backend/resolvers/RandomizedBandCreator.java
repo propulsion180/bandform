@@ -46,7 +46,8 @@ public class RandomizedBandCreator {
             @Argument String city,
             @Argument String country,
             @Argument List<String> genres,
-            @Argument String description
+            @Argument String description,
+            @Argument Integer instrumentSearchDepth
     ){
         User u = userService.getUserById(yourUID);
         Band b = bandService.createBand(name, description, city, country, genres);
@@ -61,16 +62,28 @@ public class RandomizedBandCreator {
         // For each instrument, go and find a user whose best instrument is the same and make them a member. Only those who consent for random addition. If it can not find a person whose best instrument is the current one, it will add an open band position for the creator to select from and invite.
         for(Instrument i : instrus){
             Boolean found = false;
-            for(User us : scoredUsers.keySet()){
-                if(us.getStatus() == UserStatus.BAND || us.getStatus() == UserStatus.BANDSEL || us.getStatus() == UserStatus.NOBANDSEL){scoredUsers.remove(us); continue;}
-                if(us.equals(u)){scoredUsers.remove(us); continue;}
-                Instrument first = us.getInstruments().getFirst();
-                if(i.equals(first)){
-                    bandMemberService.createBandMember(b, us, List.of(first), first.getName());
-                    scoredUsers.remove(us);
-                    found = true;
-                    break;
+            for(int j=0; j < instrumentSearchDepth; j++) {
+                for (User us : scoredUsers.keySet()) {
+                    if(us.getInstruments().size() <= j){continue;}
+                    if (us.getStatus() == UserStatus.BAND || us.getStatus() == UserStatus.BANDSEL || us.getStatus() == UserStatus.NOBANDSEL) {
+                        scoredUsers.remove(us);
+                        continue;
+                    }
+                    if (us.equals(u)) {
+                        scoredUsers.remove(us);
+                        continue;
+                    }
+
+                    Instrument depthI = us.getInstruments().get(j);
+                    if (i.equals(depthI)) {
+                        bandMemberService.createBandMember(b, us, List.of(depthI), depthI.getName());
+                        scoredUsers.remove(us);
+                        found = true;
+                        break;
+                    }
                 }
+
+                if(found){break;}
             }
 
             if(!found){
