@@ -39,6 +39,7 @@ public class GenreService {
                 .collect(Collectors.toList());
 
         if (!newGenres.isEmpty()){
+            log.info(newGenres.size() + "new genres were added to the database");
             genreRepository.saveAll(newGenres);
         }
 

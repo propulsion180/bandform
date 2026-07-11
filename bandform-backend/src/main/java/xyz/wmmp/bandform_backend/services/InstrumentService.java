@@ -38,6 +38,7 @@ public class InstrumentService {
                         .collect(Collectors.toList());
 
                 if(!newInstrument.isEmpty()){
+                        log.info(newInstrument.size() + " new instruments were added to the database.");
                         instrumentRepository.saveAll(newInstrument);
                 }
 

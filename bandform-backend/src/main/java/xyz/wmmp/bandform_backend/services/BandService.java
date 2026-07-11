@@ -54,25 +54,7 @@ public class BandService {
         b.setDescription(desc);
         b.setCity(city);
         b.setCountry(country);
-
-        List<Genre> existingGenre = genreRepository.findByNameIn(genreNames);
-        Set<String> existingGenreNames = existingGenre.stream().map(Genre::getName).collect(Collectors.toSet());
-        List<String> missingGenreNames = genreNames.stream().filter(n -> !existingGenreNames.contains(n)).collect(Collectors.toList());
-
-        List<Genre> newGenres = missingGenreNames.stream()
-                .map(n -> {
-                    Genre g = new Genre();
-                    g.setName(n);
-                    return g;
-                }).collect(Collectors.toList());
-
-        if(!newGenres.isEmpty()){
-            genreRepository.saveAll(newGenres);
-        }
-
-        List<Genre> allG = new ArrayList<>(existingGenre);
-        allG.addAll(newGenres);
-        b.setGenres(allG);
+        b.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));
         return bandRepository.save(b);
     }
 

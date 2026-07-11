@@ -9,6 +9,7 @@ import xyz.wmmp.bandform_backend.repositories.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class BandMemberService {
@@ -29,7 +30,7 @@ public class BandMemberService {
     }
 
     public List<BandMember> membersInBand(Long bandId){
-        return bandMemberRepository.findByBandNameIn(bandId).orElse(null);
+        return bandMemberRepository.findByBandNameIn(bandId).orElseThrow(() -> new NoSuchElementException("No bandmembers in band with Id " + bandId));
     }
 
     public BandMember createBandMember(Band band, User user, List<Instrument> instruments, String role){
@@ -65,7 +66,7 @@ public class BandMemberService {
     }
 
     public Long removeMember(Long memberId){
-        BandMember bm = bandMemberRepository.findById(memberId).orElse(null);
+        BandMember bm = bandMemberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("Couldn't find member to delete. Maybe deleted already  " + memberId));
         if(bm == null){return null;}
         Band b = bm.getBand();
         List<BandMember> toUpdate = b.getMembers();

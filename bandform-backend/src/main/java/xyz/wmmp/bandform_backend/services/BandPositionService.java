@@ -10,6 +10,7 @@ import xyz.wmmp.bandform_backend.repositories.BandPositionRepository;
 import xyz.wmmp.bandform_backend.repositories.BandRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class BandPositionService {
@@ -26,11 +27,11 @@ public class BandPositionService {
     }
 
     public BandPosition getBandPositionById(Long bPId){
-        return bandPositionRepository.findById(bPId).orElse(null);
+        return bandPositionRepository.findById(bPId).orElseThrow(() -> new NoSuchElementException("band position with this ID doesn't exist!"));
     }
 
     public List<BandPosition> getBandPositionsInBand(Long bId){
-        return bandPositionRepository.findByBandId(bId).orElse(null);
+        return bandPositionRepository.findByBandId(bId).orElseThrow(() -> new NoSuchElementException("this band has no positions"));
     }
 
     public BandPosition createBandPosition(Long bandId, String instrumentName, String description){
@@ -75,7 +76,7 @@ public class BandPositionService {
    }
 
    public Long deleteBandPosition(Long bpId){ //should not need this after first setup.
-        BandPosition bp = bandPositionRepository.findById(bpId).orElse(null);
+        BandPosition bp = bandPositionRepository.findById(bpId).orElseThrow(() -> new NoSuchElementException("couldn't find band position from id: " + bpId));
         if(bp == null){return null;}
         Band b = bp.getBand();
         List<BandPosition> toUpdate = b.getOpenPositions();

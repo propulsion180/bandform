@@ -14,7 +14,9 @@ import xyz.wmmp.bandform_backend.repositories.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +29,9 @@ public class UserService {
     private final InstrumentService instrumentService;
     private final BandMemberService bandMemberService;
     private final PasswordEncoder passwordEncoder;
+
+    String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+    Pattern p = Pattern.compile(emailRegex);
 
     @Autowired
     public UserService(UserRepository userRepository, GenreRepository genreRepository, InstrumentRepository instrumentRepository, GenreService genreService, InstrumentService instrumentService, BandMemberService bandMemberService, PasswordEncoder passwordEncoder){
@@ -46,12 +51,13 @@ public class UserService {
 
     public UserProfile getUserProfileById(Long id){
         log.debug("User with id: {}, being retrieved", id);
-        return UserProfile.from(userRepository.findById(id).orElse(null));
+        User u = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("A user with this ID doesn't exist :("));
+        return UserProfile.from(u);
     }
 
     public User getUserById(Long id){
         log.debug("User with id: {}, being retrieved", id);
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("user with this ID doesn't exist :(. This should only be triggered within nested calls."));
     }
 
     public Long deleteUser(Long id){
@@ -66,8 +72,11 @@ public class UserService {
         if(userRepository.findByName(name).isPresent()){ throw new IllegalArgumentException("UserName already taken"); }
         User u = new User();
         u.setName(name);
+        if(p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
         u.setEmail(email);
+        if(plainPassword.length() < 8){ throw new IllegalArgumentException("Password needs to be larger than 8 characters"); }
         u.setPasswordHash(passwordEncoder.encode(plainPassword));
+        if(age < 16 || age > 120){ throw new IllegalArgumentException("Must be 16 or older to use this service");}
         u.setAge(age);
         u.setCity(city);
         u.setCountry(country);
@@ -78,11 +87,11 @@ public class UserService {
         return UserProfile.from(userRepository.save(u));
     }
 
-    public Long updateUser(Long id, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships){
-       User u = userRepository.findById(id).orElse(null);
+    public Long updateUser(Long uid, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships){
+       User u = userRepository.findById(uid).orElse(null);
        if(u == null){return null;}
-
        if(name != null && !name.isBlank()){u.setName(name);}
+       if(p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
        if(email != null && !email.isBlank()){u.setEmail(email);}
        if(age != null){u.setAge(age);}
        if(city != null && !city.isBlank()){u.setCity(city);}
@@ -94,7 +103,7 @@ public class UserService {
        if(memberships != null){u.setBandMemberships(memberships);}
 
        userRepository.save(u);
-       return id;
+       return uid;
     }
 
 }

@@ -8,6 +8,7 @@ import xyz.wmmp.bandform_backend.repositories.JoinRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class JoinRequestService {
@@ -34,15 +35,15 @@ public class JoinRequestService {
     }
 
     public List<JoinRequest> getUserJoinRequests(Long uID){
-        return joinRequestRepository.findByUserId(uID).orElse(null);
+        return joinRequestRepository.findByUserId(uID).orElseThrow(() -> new NoSuchElementException("No joinRequests reffering to user " + uID));
     }
 
     public List<JoinRequest> getBandJoinRequests(Long bID){
-        return joinRequestRepository.findByBandId(bID).orElse(null);
+        return joinRequestRepository.findByBandId(bID).orElseThrow(() -> new NoSuchElementException("No joinRequests refering to the band " + bID));
     }
 
     public JoinRequest getJoinRequestById(Long id){
-        return joinRequestRepository.findById(id).orElse(null);
+        return joinRequestRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No joinRequest with ID " + id));
     }
 
     public Long deleteJoinRequestById(Long id){
@@ -69,7 +70,7 @@ public class JoinRequestService {
 
     public Long reject(Long jRID){
         JoinRequest jr = joinRequestRepository.findById(jRID).orElse(null);
-        if(jr == null){/*log stuff*/ }
+        if(jr == null){/*log stuff*/}
         jr.setStatus(RequestStatus.REJECTED);
         joinRequestRepository.save(jr);
         return jRID;// notify hook for notifications
