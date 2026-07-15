@@ -87,7 +87,7 @@ public class UserService {
         return UserProfile.from(userRepository.save(u));
     }
 
-    public Long updateUser(Long uid, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships){
+    public Long updateUser(Long uid, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships, List<Notification> notifications){
        User u = userRepository.findById(uid).orElse(null);
        if(u == null){return null;}
        if(name != null && !name.isBlank()){u.setName(name);}
@@ -101,6 +101,7 @@ public class UserService {
        if(genreNames != null){u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));}
        if(instrumentNames != null){u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));}
        if(memberships != null){u.setBandMemberships(memberships);}
+       if(notifications != null){u.setNotifications(notifications);}
 
        userRepository.save(u);
        return uid;
