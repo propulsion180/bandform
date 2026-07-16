@@ -1,4 +1,4 @@
-enum RequestStatus{
+senum RequestStatus{
     PENDING
     ACCEPTED
     REJECTED
@@ -84,7 +84,13 @@ type LoginResult {
     user: User!
 }
 
-
+type Notification {
+    id: ID!
+    user: User!
+    message: String!
+    read: Boolean!
+    from: String!
+}
 
 type Query {
     users: [User!]!
@@ -191,4 +197,8 @@ type Mutation {
     login(name: String!, password: String!): LoginResult!
     logout: Boolean!
     changePassword(newPassword: String!): Boolean!
+}
+
+type Subscription {
+    notifications: Notification!
 }

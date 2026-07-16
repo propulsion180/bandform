@@ -1,11 +1,13 @@
 package xyz.wmmp.bandform_backend.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import xyz.wmmp.bandform_backend.data.Band;
 import xyz.wmmp.bandform_backend.data.Genre;
 import xyz.wmmp.bandform_backend.data.Instrument;
 import xyz.wmmp.bandform_backend.data.User;
+import xyz.wmmp.bandform_backend.repositories.UserRepository;
 
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +15,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class RankingService {
+
+    private final UserRepository userRepository;
+
+    @Autowired
+    public RankingService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public Map<User, Double> rankedUsers(
             Band b,
             Boolean withinCity,
@@ -20,9 +30,9 @@ public class RankingService {
             Boolean sameGenre,
             Boolean singleInstrument,
             Integer locWeight,
-            Integer genreWeight,
+            Integer genreWeight
     ){
-        Specification<User> spec = Specification.where(null);
+        Specification<User> spec = Specification.where((Specification<User>) null);
         if(withinCity){
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.and(
                     criteriaBuilder.equal(root.get("city"), b.getCity())
@@ -60,24 +70,27 @@ public class RankingService {
 
             for(Genre g : b.getGenres()){
                 if(u.getGenres().contains(g)){
-                    score += genreInc;
+                    score += genreInc * locWeight;
                 }
 
             }
 
-            Set<Instrument> bandInstrumentsToCheck = null;
+            Set<Instrument> bandInstrumentsToCheck = b.getOpenPositions().stream().map(pos -> pos.getInstrument()).collect(Collectors.toSet());
+            Set<Instrument> userI = u.getInstruments().stream().collect(Collectors.toSet());
 
             if(singleInstrument){
-                bandInstrumentsToCheck = Set.of(bp.getInstrument());
+                for(Instrument i : bandInstrumentsToCheck){
+                    if(userI.contains(i)){
+                        score += 25.0;
+                        break;
+                    }
+                }
             }else{
-                bandInstrumentsToCheck = b.getOpenPositions().stream().map(pos -> pos.getInstrument()).collect(Collectors.toSet());
-            }
-
-            Double instruIncrement = 25.0 / bandInstrumentsToCheck.size();
-
-            for(Instrument i : u.getInstruments()){
-                if(bandInstrumentsToCheck.contains(i)){
-                    score += instruIncrement;
+                Double instruIncrement = 25.0 / bandInstrumentsToCheck.size();
+                for(Instrument i : bandInstrumentsToCheck){
+                    if(userI.contains(i)){
+                        score += instruIncrement;
+                    }
                 }
             }
 

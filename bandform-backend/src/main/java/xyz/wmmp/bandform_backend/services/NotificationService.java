@@ -1,13 +1,12 @@
 package xyz.wmmp.bandform_backend.services;
 
-import java.awt.List;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import xyz.wmmp.bandform_backend.repositories.NotificationRepository;
-import xyz.wmmp.bandform_backend.repositories.UserRepository;
 import xyz.wmmp.bandform_backend.data.Notification;
 import xyz.wmmp.bandform_backend.data.User;
 
@@ -33,7 +32,8 @@ public class NotificationService{
     n = notificationRepository.save(n);
     List<Notification> toUpdate = u.getNotifications();
     toUpdate.add(n);
-    userService.updateUser(u.getId(), null, null, null, null, null, null, null, null, null, null, null, toUpdate);
+    userService.updateUser(u.getId(), null, null, null, null, null, null, null, null, null, null, toUpdate);
+    return n;
   }
 
   public Long deleteNotification(Long id){
@@ -45,6 +45,8 @@ public class NotificationService{
     userService.updateUser(n.getUser().getId(), null, null, null, null, null, null, null, null, null, null, toUpdate);
 
     notificationRepository.deleteById(id);
+
+    return id;
   }
   
   
