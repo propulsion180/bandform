@@ -58,7 +58,9 @@ public class User {
 
         @NotEmpty
         @NotBlank
-        private String role; //Can be USER or ADMIN
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        private UserType role;
 
         private boolean locked = false;
 

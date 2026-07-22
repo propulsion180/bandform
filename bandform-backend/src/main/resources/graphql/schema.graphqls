@@ -1,4 +1,4 @@
-senum RequestStatus{
+enum RequestStatus{
     PENDING
     ACCEPTED
     REJECTED
@@ -10,6 +10,12 @@ enum UserStatus {
     BAND
     BANDRAND
     BANDSEL
+}
+
+enum UserType{
+    OWNER
+    ADMIN
+    NORMAL
 }
 
 
@@ -33,6 +39,7 @@ type User{
     city: String!
     country: String!
     descripition: String!
+    role: UserType!
     status: UserStatus!
     genres: [Genre]!
     instruments: [Instrument]!

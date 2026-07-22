@@ -61,7 +61,7 @@ public class UserResolver{
             @Argument List<String> genres,
             @Argument List<String> instruments
     ){
-        return userService.updateUser(id, name, email, age, city, country, description, status, genres, instruments, null);
+        return userService.updateUser(id, name, email, age, city, country, description, status, genres, instruments, null, null);
     }
 
     @MutationMapping

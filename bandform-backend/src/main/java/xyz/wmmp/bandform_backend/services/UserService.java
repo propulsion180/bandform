@@ -4,9 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import jdk.vm.ci.meta.ExceptionHandler;
 import xyz.wmmp.bandform_backend.data.*;
 import xyz.wmmp.bandform_backend.repositories.GenreRepository;
 import xyz.wmmp.bandform_backend.repositories.InstrumentRepository;
@@ -83,11 +86,19 @@ public class UserService {
         u.setDescription(desc);
         u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));
         u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));
-        u.setRole("USER");
+        u.setRole(UserType.NORMAL);
         return UserProfile.from(userRepository.save(u));
     }
 
     public Long updateUser(Long uid, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships, List<Notification> notifications){
+
+       Long upid = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+       if(upid != uid){           
+           User updater = userRepository.findById(upid).orElseThrow(() -> new IllegalArgumentException());
+           if(updater.getRole() == UserType.NORMAL){throw IllegalAccessException("Unpriveledged access!!!! by: " + updater.getName() + " uid: " + upid);}
+       }
+       
+        
        User u = userRepository.findById(uid).orElse(null);
        if(u == null){return null;}
        if(name != null && !name.isBlank()){u.setName(name);}

@@ -1,0 +1,31 @@
+{
+  "name": "bandform-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "graphql-codegen && node esbuild.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPLv3",
+  "packageManager": "pnpm@10.9.0",
+  "dependencies": {
+    "@apollo/client": "^4.2.7",
+    "graphql": "^17.0.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.5.2"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^7.2.0",
+    "@graphql-codegen/client-preset": "^6.1.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "esbuild": "^0.25.3",
+    "esbuild-sass-plugin": "^3.3.1",
+    "sass": "^1.87.0",
+    "typescript": "^5.8.3"
+  }
+}
