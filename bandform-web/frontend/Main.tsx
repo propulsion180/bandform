@@ -1,14 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { LoginMutation } from "./gql/graphql";
 
 interface MainProps {
-  images: Map<string, ImageData>;
-  user: String;
+  user: LoginMutation['login']['user'] | null;
 }
 
 
 
-export default function Main({ user, images }: MainProps) {
+export default function Main({ user }: MainProps) {
 
 
   return (

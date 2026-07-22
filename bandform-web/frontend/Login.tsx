@@ -11,17 +11,49 @@ interface LoginProps {
 
 
 const LOGIN = graphql(`
-  mutation Login($name: String!, $password: String!){
+   mutation Login($name: String!, $password: String!){
     login(name: $name, password: $password){
        user {
          id
          name
          email
+         age
+         city
+         country
+         description
          role
+         genres{
+           name 
+         }
+         instruments{
+           name
+         }
+         bandMemberships{
+           band{
+             name
+             description
+             genres{
+               name
+             }
+             members{
+               user{
+                 name
+               }
+             }
+             openPositions{
+               instrument{
+                 name
+               }
+               filled
+             }
+           }
+           joinedDate
+         }
        }
     }
   }
   `);
+
 
 export default function Login({ setUser }: LoginProps) {
   // States to hold form input values

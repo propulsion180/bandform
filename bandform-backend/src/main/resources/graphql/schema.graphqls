@@ -38,7 +38,7 @@ type User{
     age: Int!
     city: String!
     country: String!
-    descripition: String!
+    description: String!
     role: UserType!
     status: UserStatus!
     genres: [Genre]!

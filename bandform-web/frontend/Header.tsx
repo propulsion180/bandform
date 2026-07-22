@@ -8,7 +8,6 @@ import Login from "./Login";
 interface HeaderProps {
   user: LoginMutation['login']['user'] | null ;
   setUser: (value: LoginMutation['login']['user'] | null) => void;
-  logout: () => Promise<void>;
 }
 
 const LOGOUT = graphql(`

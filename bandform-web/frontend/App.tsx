@@ -8,12 +8,12 @@ import {
   BrowserRouter as Router,
 } from "react-router-dom";
 import Main from "./Main";
-import Single from "./Single";
 import Login from "./Login";
 import Signup from "./Signup";
 import Admin from "./Admin";
 import Header from "./Header";
 import { LoginMutation } from "./gql/graphql";
+import Band from "./Band";
 
 
 
@@ -43,17 +43,17 @@ const App: React.FC = () => {
   return (
     <div className="center">
       <Router>
-        <Header user={user} logout={logout} />
+        <Header user={user} setUser={setUser} />
         <Routes>
           <Route path="/" element={<Main user={user} />} />
-          // <Route path="/single" element={<Single />} />
+          <Route path="/band" element={<Band user={user} />} />
           <Route
             path="/login"
             element={
               <Login setUser={setUser} />
             }
           />
-          <Route path="/signup" element={<Signup host={host} />} />
+          <Route path="/signup" element={<Signup />} />
           <Route
             path="/admin"
             element={<Admin user={user} />}
