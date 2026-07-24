@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import xyz.wmmp.bandform_backend.data.User;
 import xyz.wmmp.bandform_backend.data.UserProfile;
@@ -22,16 +23,17 @@ public class UserResolver{
         this.userService = userService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<UserProfile> users(){
         return userService.getAllUsers();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public UserProfile user(@Argument Long id){
         return userService.getUserProfileById(id);
     }
-
 
     @MutationMapping
     public UserProfile createUser(
@@ -48,6 +50,8 @@ public class UserResolver{
         return userService.createUser(name, email, plainPassword, age, city, country, description, genres, instruments);
     }
 
+
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ADMIN', 'OWNER') or #id == authentication.principal.id")
     @MutationMapping
     public Long updateUser(
             @Argument Long id,
@@ -64,6 +68,7 @@ public class UserResolver{
         return userService.updateUser(id, name, email, age, city, country, description, status, genres, instruments, null, null);
     }
 
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ADMIN', 'OWNER') or #id == authentication.principal.id")
     @MutationMapping
     public Long deleteUser(@Argument Long id){
          return userService.deleteUser(id);

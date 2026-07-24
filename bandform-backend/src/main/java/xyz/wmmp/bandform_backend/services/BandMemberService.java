@@ -30,7 +30,7 @@ public class BandMemberService {
     }
 
     public List<BandMember> membersInBand(Long bandId){
-        return bandMemberRepository.findByBandNameIn(bandId).orElseThrow(() -> new NoSuchElementException("No bandmembers in band with Id " + bandId));
+        return bandMemberRepository.findByBandId(bandId).orElseThrow(() -> new NoSuchElementException("No bandmembers in band with Id " + bandId));
     }
 
     public BandMember createBandMember(Band band, User user, List<Instrument> instruments, String role){

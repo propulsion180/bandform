@@ -100,7 +100,7 @@ public class JoinRequestService {
         n.setUser(jr.getUser());
         n.setMessage("Sorry " + jr.getUser().getName() + " but your request to join " + jr.getBand().getName() + " has been rejected");
         n.setRead(false);
-        n.setFrom(jr.getBand().getName());
+        n.setSender(jr.getBand().getName());
         notificationRepository.save(n);
         notificationPublisher.publish(jr.getUser().getId(), n);
         return jRID;// notify hook for notifications
@@ -120,7 +120,7 @@ public class JoinRequestService {
         n.setUser(jr.getUser());
         n.setMessage(jr.getUser().getName() + ", you have been accepted as a " + bm.getRole() + " for " + jr.getBand().getName());
         n.setRead(false);
-        n.setFrom(jr.getBand().getName());
+        n.setSender(jr.getBand().getName());
         notificationRepository.save(n);
         notificationPublisher.publish(jr.getUser().getId(), n);
         

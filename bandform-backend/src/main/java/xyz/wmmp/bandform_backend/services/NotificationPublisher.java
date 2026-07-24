@@ -3,12 +3,13 @@ package xyz.wmmp.bandform_backend.services;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import xyz.wmmp.bandform_backend.data.Notification;
 import reactor.core.publisher.Sinks;
 import reactor.core.publisher.Flux;
 
-@Component
+@Service
 public class NotificationPublisher {
   private final Map<Long, Sinks.Many<Notification>> userSinks = new ConcurrentHashMap<>();
 

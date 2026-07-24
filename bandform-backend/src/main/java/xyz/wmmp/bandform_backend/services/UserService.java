@@ -3,13 +3,16 @@ package xyz.wmmp.bandform_backend.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import jdk.vm.ci.meta.ExceptionHandler;
+
 import xyz.wmmp.bandform_backend.data.*;
 import xyz.wmmp.bandform_backend.repositories.GenreRepository;
 import xyz.wmmp.bandform_backend.repositories.InstrumentRepository;
@@ -93,9 +96,10 @@ public class UserService {
     public Long updateUser(Long uid, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships, List<Notification> notifications){
 
        Long upid = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+       if(upid == null){throw new InsufficientAuthenticationException("Only logged in people can update users");}
        if(upid != uid){           
            User updater = userRepository.findById(upid).orElseThrow(() -> new IllegalArgumentException());
-           if(updater.getRole() == UserType.NORMAL){throw IllegalAccessException("Unpriveledged access!!!! by: " + updater.getName() + " uid: " + upid);}
+           if(updater.getRole() == UserType.NORMAL){throw new AccessDeniedException("Unpriveledged access!!!! by: " + updater.getName() + " uid: " + upid);}
        }
        
         

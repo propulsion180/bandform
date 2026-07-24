@@ -44,7 +44,7 @@ public class AuthResolver {
         User user = userRepository.findByName(name).orElseThrow();
 
         String jti = UUID.randomUUID().toString();
-        String token = jwtUtil.generateToken(jti, user.getId().toString(), user.getRole());
+        String token = jwtUtil.generateToken(jti, user.getId().toString(), user.getRole().toString());
 
         user.setJtiToken(jti);
         user.setTokenExpiry(Instant.now().plus(1, ChronoUnit.DAYS));

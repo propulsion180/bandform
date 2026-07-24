@@ -4,8 +4,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
+
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
 
+@Component
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 

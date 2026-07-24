@@ -22,11 +22,11 @@ public class NotificationService{
   }
 
 
-  public Notification createNotification(User u, String from, String message){
+  public Notification createNotification(User u, String sender, String message){
     Notification n = new Notification();
 
     n.setUser(u);
-    n.setFrom(from);
+    n.setSender(sender);
     n.setMessage(message);
 
     n = notificationRepository.save(n);

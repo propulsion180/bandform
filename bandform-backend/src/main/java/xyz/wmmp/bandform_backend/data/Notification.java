@@ -28,7 +28,7 @@ public class Notification{
 
   private String message;
 
-  private String from;
+  private String sender;
 
   private Boolean read = false;
 	
