@@ -1,20 +1,19 @@
 import React, { useState } from "react";
-import { ImageData } from "./App";
 import { useNavigate } from "react-router-dom";
 import Description from "./Description";
-import AddImage from "./AddImage";
-import UpdateImage from "./UpdateImage";
 import { LoginMutation } from "./gql/graphql";
+import { graphql } from "./gql";
+import { DELETE_BAND, DELETE_BAND_MEMBER, DELETE_BAND_POSITION, DELETE_JOIN_REQUEST, DELETE_USER } from "./Queries"
 
 interface AdminProps {
-  user: LoginMutationn;
+  user: LoginMutation['login']['user'] | null;
 }
 
 export default function Admin({ user }: AdminProps) {
   const navigate = useNavigate();
   const [page, setPage] = useState<string>("desc");
 
-  if(user.role == "NORMAL"){
+  if(user.role == null || user.role == "NORMAL"){
     navigate("/");
   }
   

@@ -3,15 +3,9 @@ import { graphql } from "./gql/";
 import { useMutation } from "@apollo/client/react";
 import { CreateUserMutation, CreateUserMutationVariables } from "./gql/graphql";
 import { useNavigate } from "react-router-dom";
+import { SIGNUP } from "./Queries";
 
-const SIGNUP = graphql(`  
-  mutation CreateUser($name: String!, $email: String!, $plainPassword: String!, $age: Int!, $city: String!, $country: String!, $description: String!, $genres: [String!]!, $instruments: [String!]!) {
-    createUser(name: $name, email: $email, plainPassword: $plainPassword, age: $age, city: $city, country: $country, description: $description, genres: $genres, instruments: $instruments){
-      id
-      name
-    }
-  }
-  `);
+
 
 export default function Signup() {
   // States to hold form input values

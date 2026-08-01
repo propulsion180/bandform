@@ -1,20 +1,14 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ImageData } from "./App";
 import { LoginMutation, UserType } from "./gql/graphql";
 import { graphql } from "./gql";
 import { useMutation } from "@apollo/client/react";
 import Login from "./Login";
+import { LOGOUT } from "./Queries";
 interface HeaderProps {
   user: LoginMutation['login']['user'] | null ;
   setUser: (value: LoginMutation['login']['user'] | null) => void;
 }
-
-const LOGOUT = graphql(`
-    mutation Logout{
-      logout
-    }
-  `);
 
 export default function Header({ user, setUser }: HeaderProps) {
   const navigate = useNavigate();
@@ -37,7 +31,7 @@ export default function Header({ user, setUser }: HeaderProps) {
 
   return (
     <div className="header">
-      {user == null && <h1>Migada's Image Gallery</h1>}
+      {user == null && <h1>Bandform</h1>}
       {user != null && <h1>Welcome {user.name}</h1>}
       <div className="navButtonContainer">
         <a

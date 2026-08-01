@@ -50,7 +50,7 @@ public class RecommenderResolver {
         Long uid = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User u = userService.getUserById(uid);
 
-        Specification<Band> spec = Specification.where(null);
+        Specification<Band> spec = Specification.where((Specification<Band>) null);
         if(withinCity){
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.and(
                     criteriaBuilder.equal(root.get("city"), u.getCity())

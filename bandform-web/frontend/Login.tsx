@@ -4,56 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useReactiveVar } from "@apollo/client/react";
 import { LoginDocument, LoginMutation, LoginMutationVariables } from "./gql/graphql";
 
+import { LOGIN } from "./Queries"
 
 interface LoginProps {
   setUser: (value: LoginMutation['login']['user'] | null) => void;
 }
-
-
-const LOGIN = graphql(`
-   mutation Login($name: String!, $password: String!){
-    login(name: $name, password: $password){
-       user {
-         id
-         name
-         email
-         age
-         city
-         country
-         description
-         role
-         genres{
-           name 
-         }
-         instruments{
-           name
-         }
-         bandMemberships{
-           band{
-             name
-             description
-             genres{
-               name
-             }
-             members{
-               user{
-                 name
-               }
-             }
-             openPositions{
-               instrument{
-                 name
-               }
-               filled
-             }
-           }
-           joinedDate
-         }
-       }
-    }
-  }
-  `);
-
 
 export default function Login({ setUser }: LoginProps) {
   // States to hold form input values
