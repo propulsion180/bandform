@@ -13,9 +13,12 @@ export default function Admin({ user }: AdminProps) {
   const navigate = useNavigate();
   const [page, setPage] = useState<string>("desc");
 
-  if(user.role == null || user.role == "NORMAL"){
+  if(user.role == null){
     navigate("/");
   }
+
+  
+
   
   // const deleteImage = async (filepath: string) => {
   //   try {
@@ -40,6 +43,19 @@ export default function Admin({ user }: AdminProps) {
   // };
 
   return (
+
+    <>
+      {user?.role == "OWNER" && <>
+          
+        </>}
+      {(user?.role == "ADMIN" || user?.role == "OWNER") && <>
+        
+        </>}
+      {(user?.role == "NORMAL" || user?.role == "ADMIN" || user?.role == "OWNER") && <>
+        
+        </>}      
+    </>
+    
     // <>
     //   <div className="admin-buttons-area">
     //     <a
@@ -106,6 +122,5 @@ export default function Admin({ user }: AdminProps) {
     //   </table>
     // </>
     //
-    <></>
   );
 }
