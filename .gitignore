@@ -30,4 +30,4 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
-./bandform-web/node_modules/
+bandform-web/node_modules/
