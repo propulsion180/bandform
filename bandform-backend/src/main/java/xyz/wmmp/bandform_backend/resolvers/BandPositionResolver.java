@@ -44,8 +44,10 @@ public class BandPositionResolver {
     }
 
     @MutationMapping
-    public Long updateBandPosition(Long bpId, Long bId, String instrument, String description, boolean filled, Long fillerId){
-        return bandPositionService.updateBandPosition(bpId, bandService.getBandById(bId), instrument, description, filled, userService.getUserById(fillerId));
+    public Long updateBandPosition(Long bpId, Long bId, String instrument, String description, Boolean filled, Long fillerId){
+        Band band = bId != null ? bandService.getBandById(bId) : null;
+        User filler = fillerId != null ? userService.getUserById(fillerId) : null;
+        return bandPositionService.updateBandPosition(bpId, band, instrument, description, filled, filler);
     }
 
     @MutationMapping

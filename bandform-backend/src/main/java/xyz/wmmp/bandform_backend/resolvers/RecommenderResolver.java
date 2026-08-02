@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import xyz.wmmp.bandform_backend.data.*;
 import xyz.wmmp.bandform_backend.repositories.BandRepository;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
+import xyz.wmmp.bandform_backend.services.BandPositionService;
 import xyz.wmmp.bandform_backend.services.RankingService;
 import xyz.wmmp.bandform_backend.services.UserService;
 
@@ -27,12 +28,14 @@ public class RecommenderResolver {
     private final BandRepository bandRepository;
     private final UserRepository userRepository;
     private final RankingService rankingService;
+    private final BandPositionService bandPositionService;
 
-    public RecommenderResolver(UserService userService, BandRepository bandRepository, UserRepository userRepository, RankingService rankingService) {
+    public RecommenderResolver(UserService userService, BandRepository bandRepository, UserRepository userRepository, RankingService rankingService, BandPositionService bandPositionService) {
         this.userService = userService;
         this.bandRepository = bandRepository;
         this.userRepository = userRepository;
         this.rankingService = rankingService;
+        this.bandPositionService = bandPositionService;
     }
 
     @QueryMapping
@@ -42,15 +45,15 @@ public class RecommenderResolver {
             @Argument Boolean sameGenre,
             @Argument Integer locGenreWeight
     ){
-        if(locGenreWeight >= -5 || locGenreWeight <= 5 ){ throw new IllegalArgumentException("weighting cant be more than 5 or less than -5 ");}
+        if(locGenreWeight < -5 || locGenreWeight > 5 ){ throw new IllegalArgumentException("weighting cant be more than 5 or less than -5 ");}
 
         Integer locWeight = 5 + locGenreWeight;
         Integer GenreWeight = 5 - locGenreWeight;
 
-        Long uid = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long uid = Long.parseLong((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         User u = userService.getUserById(uid);
 
-        Specification<Band> spec = Specification.where((Specification<Band>) null);
+        Specification<Band> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
         if(withinCity){
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.and(
                     criteriaBuilder.equal(root.get("city"), u.getCity())
@@ -110,7 +113,7 @@ public class RecommenderResolver {
 
     @QueryMapping
     public List<UserProfile> recommendUser(
-            @Argument BandPosition bp,
+            @Argument Long bp,
             @Argument Boolean withinCity,
             @Argument Boolean withinCountry,
             @Argument Boolean sameGenre,
@@ -118,11 +121,13 @@ public class RecommenderResolver {
             @Argument Integer locGenreWeight
 
     ){
-        if(locGenreWeight >= -5 || locGenreWeight <= 5 ){ throw new IllegalArgumentException("weighting cant be more than 5 or less than -5 ");}
+        if(locGenreWeight < -5 || locGenreWeight > 5 ){ throw new IllegalArgumentException("weighting cant be more than 5 or less than -5 ");}
 
         Integer locWeight = 5 + locGenreWeight;
         Integer genreWeight = 5 - locGenreWeight;
 
-        return rankingService.rankedUsers(bp.getBand(), withinCity, withinCountry, sameGenre, singleInstrument, locWeight, genreWeight).entrySet().stream().sorted(Map.Entry.<User, Double>comparingByValue().reversed()).map(Map.Entry::getKey).map(u -> UserProfile.from(u)).toList();
+        BandPosition position = bandPositionService.getBandPositionById(bp);
+
+        return rankingService.rankedUsers(position.getBand(), withinCity, withinCountry, sameGenre, singleInstrument, locWeight, genreWeight).entrySet().stream().sorted(Map.Entry.<User, Double>comparingByValue().reversed()).map(Map.Entry::getKey).map(u -> UserProfile.from(u)).toList();
     }
 }

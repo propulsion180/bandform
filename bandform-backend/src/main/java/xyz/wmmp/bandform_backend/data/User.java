@@ -56,8 +56,7 @@ public class User {
 
         private String description;
 
-        @NotEmpty
-        @NotBlank
+        @NotNull
         @Enumerated(EnumType.STRING)
         @Column(nullable = false)
         private UserType role;

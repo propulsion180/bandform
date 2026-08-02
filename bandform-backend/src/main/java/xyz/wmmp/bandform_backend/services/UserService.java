@@ -78,7 +78,7 @@ public class UserService {
         if(userRepository.findByName(name).isPresent()){ throw new IllegalArgumentException("UserName already taken"); }
         User u = new User();
         u.setName(name);
-        if(p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
+        if(!p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
         u.setEmail(email);
         if(plainPassword.length() < 8){ throw new IllegalArgumentException("Password needs to be larger than 8 characters"); }
         u.setPasswordHash(passwordEncoder.encode(plainPassword));
@@ -95,7 +95,7 @@ public class UserService {
 
     public Long updateUser(Long uid, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships, List<Notification> notifications){
 
-       Long upid = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+       Long upid = Long.parseLong((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
        if(upid == null){throw new InsufficientAuthenticationException("Only logged in people can update users");}
        if(upid != uid){           
            User updater = userRepository.findById(upid).orElseThrow(() -> new IllegalArgumentException());
@@ -106,8 +106,10 @@ public class UserService {
        User u = userRepository.findById(uid).orElse(null);
        if(u == null){return null;}
        if(name != null && !name.isBlank()){u.setName(name);}
-       if(p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
-       if(email != null && !email.isBlank()){u.setEmail(email);}
+       if(email != null && !email.isBlank()){
+           if(!p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
+           u.setEmail(email);
+       }
        if(age != null){u.setAge(age);}
        if(city != null && !city.isBlank()){u.setCity(city);}
        if(country != null && !country.isBlank()){u.setCountry(country);}

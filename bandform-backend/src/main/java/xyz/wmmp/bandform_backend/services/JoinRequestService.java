@@ -10,6 +10,7 @@ import xyz.wmmp.bandform_backend.repositories.JoinRequestRepository;
 import xyz.wmmp.bandform_backend.repositories.NotificationRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -79,14 +80,17 @@ public class JoinRequestService {
         StringBuilder s = new StringBuilder();
         interestedInstruments.forEach(ii -> s.append(ii));
 
-            
         toNotify.forEach((u) -> {
             Notification n = new Notification();
             n.setUser(u);
             n.setMessage("New join request from " + requester.getName() +  ". " + requester.getName() + " is interested in playing one or more of these instruments" + s );
+            n.setRead(false);
+            n.setSender(requester.getName());
+            notificationRepository.save(n);
+            notificationPublisher.publish(u.getId(), n);
         });
-        
-        
+
+
         return jr;
     }
 
@@ -114,7 +118,7 @@ public class JoinRequestService {
 
         //create bandmember and add to band
         Band b = jr.getBand();
-        BandMember bm = bandMemberService.createBandMember(b, jr.getUser(), jr.getInterestedInstruments(), bandRole);
+        BandMember bm = bandMemberService.createBandMember(b, jr.getUser(), new ArrayList<>(jr.getInterestedInstruments()), bandRole);
 
         Notification n = new Notification();
         n.setUser(jr.getUser());

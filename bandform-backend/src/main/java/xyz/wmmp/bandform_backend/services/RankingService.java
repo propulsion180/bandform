@@ -32,7 +32,7 @@ public class RankingService {
             Integer locWeight,
             Integer genreWeight
     ){
-        Specification<User> spec = Specification.where((Specification<User>) null);
+        Specification<User> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
         if(withinCity){
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.and(
                     criteriaBuilder.equal(root.get("city"), b.getCity())

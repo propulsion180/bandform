@@ -96,21 +96,23 @@ type Notification {
     user: User!
     message: String!
     read: Boolean!
-    from: String!
+    sender: String!
 }
 
 type Query {
+    me: User
     users: [User!]!
     user(id: ID!): User
     bands: [Band!]!
     band(id: ID!): Band
-    bandPositions(id: ID!): BandPosition
+    bandPosition(id: ID!): BandPosition
     positionsInBand(bId: ID!): [BandPosition!]
     membersInBand(bID: ID!): [BandMember!]
     joinRequest(id: ID!): JoinRequest
     userJoinRequests(uID: ID!): [JoinRequest!]
     bandJoinRequests(bID: ID!): [JoinRequest!]
-#    todo add recommenders
+    recommendBand(withinCity: Boolean!, withinCountry: Boolean!, sameGenre: Boolean!, locGenreWeight: Int!): [Band!]!
+    recommendUser(bp: ID!, withinCity: Boolean!, withinCountry: Boolean!, sameGenre: Boolean!, singleInstrument: Boolean!, locGenreWeight: Int!): [User!]!
 }
 
 type Mutation {
@@ -129,10 +131,12 @@ type Mutation {
     updateUser(
         id: ID!,
         name: String
+        email: String
         age: Int
         city: String
         country: String
         description: String
+        status: UserStatus
         genres: [String!]
         instruments: [String!]
     ): ID
@@ -187,7 +191,7 @@ type Mutation {
     createJoinRequest(
         uID: ID!
         bID: ID!
-        bpID: ID!
+        bpId: ID!
         interestedInstruments: [String!]
         message: String
     ): JoinRequest
@@ -204,6 +208,19 @@ type Mutation {
     login(name: String!, password: String!): LoginResult!
     logout: Boolean!
     changePassword(newPassword: String!): Boolean!
+
+    randomizedBandCreator(
+        yourUID: ID!
+        yourInstrument: String!
+        yourRole: String
+        name: String!
+        instruments: [String!]!
+        city: String!
+        country: String!
+        genres: [String!]!
+        description: String!
+        instrumentSearchDepth: Int!
+    ): Band!
 }
 
 type Subscription {

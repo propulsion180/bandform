@@ -2,7 +2,7 @@ package xyz.wmmp.bandform_backend.data;
 
 import java.util.List;
 
-public record UserProfile (Long id, String name, String email, Integer age, String city, String country, String description, UserType role, UserStatus status, List<Genre> genres, List<Instrument> instruments, List<BandMember> members){
+public record UserProfile (Long id, String name, String email, Integer age, String city, String country, String description, UserType role, UserStatus status, List<Genre> genres, List<Instrument> instruments, List<BandMember> bandMemberships){
     public static UserProfile from(User user){
         return new UserProfile(
                 user.getId(),

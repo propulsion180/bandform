@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "graphql-codegen && node esbuild.js"
+    "dev": "graphql-codegen && node esbuild.js --serve",
+    "build": "graphql-codegen && node esbuild.js",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +23,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^7.2.0",
     "@graphql-codegen/client-preset": "^6.1.0",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "esbuild": "^0.25.3",
