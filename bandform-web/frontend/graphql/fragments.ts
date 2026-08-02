@@ -23,6 +23,10 @@ export const BandDetailFields = graphql(`
     description
     city
     country
+    owner {
+      id
+      name
+    }
     genres {
       name
     }
@@ -59,6 +63,8 @@ export const BandJoinRequestFields = graphql(`
     status
     message
     requestedDate
+    invitedByBand
+    proposedRole
     user {
       id
       name
@@ -114,6 +120,9 @@ export const MeFields = graphql(`
       band {
         id
         name
+        owner {
+          id
+        }
       }
     }
   }

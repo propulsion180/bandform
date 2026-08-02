@@ -49,4 +49,11 @@ public class JoinRequest {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RequestStatus status = RequestStatus.PENDING;
+
+    // false: the musician (user) requested to join the band.
+    // true: the band invited the musician; proposedRole is the role offered.
+    @Column(nullable = false)
+    private boolean invitedByBand = false;
+
+    private String proposedRole;
 }

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useApolloClient, useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import { GET_BAND, GET_BAND_JOIN_REQUESTS, GET_RECOMMENDED_USERS } from "../graphql/queries";
 import {
   ACCEPT_JOIN_REQUEST,
-  CREATE_BAND_MEMBER,
   CREATE_BAND_POSITION,
   CREATE_JOIN_REQUEST,
   DELETE_BAND_MEMBER,
+  DELETE_JOIN_REQUEST,
+  INVITE_TO_BAND,
   REJECT_JOIN_REQUEST,
-  UPDATE_BAND_POSITION,
 } from "../graphql/mutations";
 import { useAuth } from "../auth/AuthContext";
 
@@ -22,13 +22,16 @@ const statusBadgeClass: Record<string, string> = {
 export default function BandDetail() {
   const { id } = useParams<{ id: string }>();
   const client = useApolloClient();
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
   const [tab, setTab] = useState<"overview" | "manage">("overview");
   const [joinPositionId, setJoinPositionId] = useState<string | null>(null);
   const [joinMessage, setJoinMessage] = useState("");
   const [newPositionInstrument, setNewPositionInstrument] = useState("");
   const [newPositionDescription, setNewPositionDescription] = useState("");
   const [findMembersFor, setFindMembersFor] = useState<string | null>(null);
+  const [invitingCandidateId, setInvitingCandidateId] = useState<string | null>(null);
+  const [inviteRole, setInviteRole] = useState("");
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [bandRole, setBandRole] = useState("");
 
@@ -64,11 +67,11 @@ export default function BandDetail() {
 
   const [createJoinRequest, { loading: joining }] = useMutation(CREATE_JOIN_REQUEST);
   const [createBandPosition] = useMutation(CREATE_BAND_POSITION);
-  const [createBandMember] = useMutation(CREATE_BAND_MEMBER);
-  const [updateBandPosition] = useMutation(UPDATE_BAND_POSITION);
+  const [inviteToBand, { loading: inviting }] = useMutation(INVITE_TO_BAND);
   const [deleteBandMember] = useMutation(DELETE_BAND_MEMBER);
   const [acceptJoinRequest] = useMutation(ACCEPT_JOIN_REQUEST);
   const [rejectJoinRequest] = useMutation(REJECT_JOIN_REQUEST);
+  const [deleteJoinRequest] = useMutation(DELETE_JOIN_REQUEST);
 
   if (!id) return null;
   if (loading) return <div className="page">Loading band...</div>;
@@ -76,7 +79,9 @@ export default function BandDetail() {
   const band = data?.band;
   if (!band) return <div className="page empty-state">Band not found.</div>;
 
-  const isMember = band.members.some((m) => m?.user.id === user?.id);
+  const myMembership = band.members.find((m) => m?.user.id === user?.id);
+  const isMember = myMembership != null;
+  const isOwner = band.owner?.id === user?.id || isAdmin;
   const myInstruments = user?.instruments.map((i) => i?.name).filter(Boolean) as string[] | undefined;
 
   const handleOpenManage = () => {
@@ -100,6 +105,12 @@ export default function BandDetail() {
     refetch();
   };
 
+  const handleLeaveBand = async () => {
+    if (!myMembership) return;
+    await deleteBandMember({ variables: { bmID: myMembership.id } });
+    navigate("/discover");
+  };
+
   const handleCreatePosition = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPositionInstrument.trim()) return;
@@ -115,13 +126,14 @@ export default function BandDetail() {
     refetch();
   };
 
-  const handleAddCandidate = async (positionId: string, instrumentName: string, candidateId: string) => {
-    await createBandMember({
-      variables: { bID: band.id, uID: candidateId, instrumentNames: [instrumentName], role: instrumentName },
+  const handleInvite = async (positionId: string, candidateId: string) => {
+    if (!inviteRole.trim()) return;
+    await inviteToBand({
+      variables: { bID: band.id, bpId: positionId, uID: candidateId, proposedRole: inviteRole },
     });
-    await updateBandPosition({ variables: { bpId: positionId, filled: true } });
-    setFindMembersFor(null);
-    refetch();
+    setInvitingCandidateId(null);
+    setInviteRole("");
+    refetchJoinRequests();
   };
 
   const handleAccept = async (requestId: string) => {
@@ -138,16 +150,28 @@ export default function BandDetail() {
     refetchJoinRequests();
   };
 
+  const handleCancelInvite = async (requestId: string) => {
+    await deleteJoinRequest({ variables: { id: requestId } });
+    refetchJoinRequests();
+  };
+
   return (
     <div className="page">
       <h2>{band.name}</h2>
       <p>
         {band.city}, {band.country}
+        {band.owner && <span className="badge badge-muted" style={{ marginLeft: "var(--space-2)" }}>Owned by {band.owner.name}</span>}
       </p>
       <div className="chip-row">
         {band.genres.map((g) => g && <span key={g.name} className="chip">{g.name}</span>)}
       </div>
       <p>{band.description}</p>
+
+      {isMember && !isOwner && (
+        <a className="small-button danger" onClick={handleLeaveBand}>
+          Leave this band
+        </a>
+      )}
 
       <div className="tab-row">
         <button
@@ -156,7 +180,7 @@ export default function BandDetail() {
         >
           Overview
         </button>
-        {isMember && (
+        {isOwner && (
           <button
             className={`tab-button ${tab === "manage" ? "active" : ""}`}
             onClick={handleOpenManage}
@@ -230,7 +254,7 @@ export default function BandDetail() {
         </>
       )}
 
-      {tab === "manage" && isMember && (
+      {tab === "manage" && isOwner && (
         <>
           <div className="section-title">Open positions</div>
           {band.openPositions.map((position) => (
@@ -259,14 +283,32 @@ export default function BandDetail() {
                       <div className="chip-row">
                         {candidate.instruments.map((i) => i && <span key={i.name} className="chip">{i.name}</span>)}
                       </div>
-                      <a
-                        className="small-button"
-                        onClick={() =>
-                          handleAddCandidate(position!.id, position!.instrument.name ?? "", candidate.id)
-                        }
-                      >
-                        Add to band
-                      </a>
+                      {invitingCandidateId === candidate.id ? (
+                        <div className="navButtonContainer">
+                          <input
+                            className="form-input"
+                            placeholder="Role you're offering"
+                            value={inviteRole}
+                            onChange={(e) => setInviteRole(e.target.value)}
+                          />
+                          <a className="small-button" onClick={() => handleInvite(position!.id, candidate.id)}>
+                            {inviting ? "Sending..." : "Send invitation"}
+                          </a>
+                          <a className="small-button secondary" onClick={() => setInvitingCandidateId(null)}>
+                            Cancel
+                          </a>
+                        </div>
+                      ) : (
+                        <a
+                          className="small-button"
+                          onClick={() => {
+                            setInvitingCandidateId(candidate.id);
+                            setInviteRole(position!.instrument.name ?? "");
+                          }}
+                        >
+                          Invite
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -292,16 +334,20 @@ export default function BandDetail() {
             </button>
           </form>
 
-          <div className="section-title">Join requests</div>
+          <div className="section-title">Join requests &amp; invitations</div>
           {(jrData?.bandJoinRequests?.length ?? 0) === 0 && (
-            <p className="empty-state">No join requests yet.</p>
+            <p className="empty-state">No join requests or invitations yet.</p>
           )}
           {jrData?.bandJoinRequests?.map((request) => {
             const requestId = request?.id;
             if (!request || !requestId) return null;
             return (
               <div key={requestId} className="card" style={{ marginBottom: "var(--space-2)" }}>
-                <strong>{request.user?.name}</strong>{" "}
+                {request.invitedByBand ? (
+                  <strong>You invited {request.user?.name}{request.proposedRole ? ` as ${request.proposedRole}` : ""}</strong>
+                ) : (
+                  <strong>{request.user?.name} wants to join</strong>
+                )}{" "}
                 <span className={`badge ${statusBadgeClass[request.status ?? "PENDING"]}`}>
                   {request.status}
                 </span>
@@ -309,7 +355,12 @@ export default function BandDetail() {
                 <div className="chip-row">
                   {request.interestedInstruments?.map((i) => i && <span key={i.name} className="chip">{i.name}</span>)}
                 </div>
-                {request.status === "PENDING" && (
+                {request.status === "PENDING" && request.invitedByBand && (
+                  <a className="small-button secondary" onClick={() => handleCancelInvite(requestId)}>
+                    Cancel invitation
+                  </a>
+                )}
+                {request.status === "PENDING" && !request.invitedByBand && (
                   <>
                     {acceptingId === requestId ? (
                       <div className="navButtonContainer">
@@ -345,15 +396,17 @@ export default function BandDetail() {
               <span>
                 {m?.user.name} -- {m?.role}
               </span>
-              <a
-                className="small-button danger"
-                onClick={async () => {
-                  await deleteBandMember({ variables: { bmID: m!.id } });
-                  refetch();
-                }}
-              >
-                Remove
-              </a>
+              {m?.user.id !== user?.id && (
+                <a
+                  className="small-button danger"
+                  onClick={async () => {
+                    await deleteBandMember({ variables: { bmID: m!.id } });
+                    refetch();
+                  }}
+                >
+                  Remove
+                </a>
+              )}
             </div>
           ))}
         </>

@@ -218,6 +218,27 @@ export const CREATE_JOIN_REQUEST = graphql(`
   }
 `);
 
+export const INVITE_TO_BAND = graphql(`
+  mutation InviteToBand(
+    $bID: ID!
+    $bpId: ID!
+    $uID: ID!
+    $proposedRole: String!
+    $message: String
+  ) {
+    inviteToBand(
+      bID: $bID
+      bpId: $bpId
+      uID: $uID
+      proposedRole: $proposedRole
+      message: $message
+    ) {
+      id
+      status
+    }
+  }
+`);
+
 export const DELETE_JOIN_REQUEST = graphql(`
   mutation DeleteJoinRequest($id: ID!) {
     deleteJoinRequest(id: $id)
@@ -231,7 +252,7 @@ export const REJECT_JOIN_REQUEST = graphql(`
 `);
 
 export const ACCEPT_JOIN_REQUEST = graphql(`
-  mutation AcceptJoinRequest($id: ID!, $bandRole: String!) {
+  mutation AcceptJoinRequest($id: ID!, $bandRole: String) {
     accept(id: $id, bandRole: $bandRole)
   }
 `);

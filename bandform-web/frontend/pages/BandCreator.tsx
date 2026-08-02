@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client/react";
-import { CREATE_BAND, CREATE_RANDOMIZED_BAND } from "../graphql/mutations";
+import { CREATE_BAND, CREATE_BAND_MEMBER, CREATE_RANDOMIZED_BAND } from "../graphql/mutations";
 import { useAuth } from "../auth/AuthContext";
 import TagInput from "../components/TagInput";
 
@@ -22,6 +22,7 @@ export default function BandCreator() {
   const [result, setResult] = useState<{ id: string; members: number; open: number } | null>(null);
 
   const [createBand, { loading: creatingManual }] = useMutation(CREATE_BAND);
+  const [createBandMember] = useMutation(CREATE_BAND_MEMBER);
   const [createRandomizedBand, { loading: creatingAuto }] = useMutation(CREATE_RANDOMIZED_BAND);
 
   if (!user) return null;
@@ -29,8 +30,17 @@ export default function BandCreator() {
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const response = await createBand({ variables: { name, description, city, country, genres } });
-    if (response.data?.createBand.id) {
-      navigate(`/band/${response.data.createBand.id}`);
+    const bandId = response.data?.createBand.id;
+    if (bandId) {
+      await createBandMember({
+        variables: {
+          bID: bandId,
+          uID: user.id,
+          instrumentNames: yourInstrument ? [yourInstrument] : [],
+          role: yourRole || yourInstrument,
+        },
+      });
+      navigate(`/band/${bandId}`);
     }
   };
 
@@ -124,6 +134,20 @@ export default function BandCreator() {
         </div>
         <TagInput label="Genres" values={genres} onChange={setGenres} placeholder="Type a genre, press Enter" />
 
+        <div>
+          <label>Instrument you'll play</label>
+          <input
+            className="form-input"
+            value={yourInstrument}
+            onChange={(e) => setYourInstrument(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Your role (optional)</label>
+          <input className="form-input" value={yourRole} onChange={(e) => setYourRole(e.target.value)} />
+        </div>
+
         {mode === "manual" && (
           <button type="submit" className="small-button" disabled={creatingManual}>
             {creatingManual ? "Creating..." : "Create band"}
@@ -132,19 +156,6 @@ export default function BandCreator() {
 
         {mode === "auto" && (
           <>
-            <div>
-              <label>Instrument you'll play</label>
-              <input
-                className="form-input"
-                value={yourInstrument}
-                onChange={(e) => setYourInstrument(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label>Your role (optional)</label>
-              <input className="form-input" value={yourRole} onChange={(e) => setYourRole(e.target.value)} />
-            </div>
             <TagInput
               label="Instruments you still need"
               values={instruments}

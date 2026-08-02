@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { GET_ADMIN_BANDS, GET_ADMIN_USERS } from "../graphql/queries";
 import { DELETE_BAND, DELETE_USER } from "../graphql/mutations";
@@ -22,9 +22,9 @@ export default function Admin() {
     if (next === "bands" && !bandsData) loadBands();
   };
 
-  if (!usersData && !bandsData && tab === "users") {
+  useEffect(() => {
     loadUsers();
-  }
+  }, []);
 
   const filteredUsers = (usersData?.users ?? []).filter((u) =>
     u.name.toLowerCase().includes(userFilter.toLowerCase())

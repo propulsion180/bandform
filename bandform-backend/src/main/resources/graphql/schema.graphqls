@@ -65,6 +65,7 @@ type Band {
     members: [BandMember]!
     openPositions: [BandPosition]!
     joinRequests: [JoinRequest]!
+    owner: User
 }
 
 type BandMember {
@@ -85,6 +86,8 @@ type JoinRequest{
     message: String
     requestedDate: String
     status: RequestStatus!
+    invitedByBand: Boolean!
+    proposedRole: String
 }
 
 type LoginResult {
@@ -196,13 +199,21 @@ type Mutation {
         message: String
     ): JoinRequest
 
+    inviteToBand(
+        bID: ID!
+        bpId: ID!
+        uID: ID!
+        proposedRole: String!
+        message: String
+    ): JoinRequest
+
     deleteJoinRequest(id: ID): ID
 
     reject(id: ID!): ID
 
     accept(
         id: ID!
-        bandRole: String!
+        bandRole: String
     ): ID
 
     login(name: String!, password: String!): LoginResult!

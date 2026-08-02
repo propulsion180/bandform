@@ -53,5 +53,10 @@ public class Band{
     @OneToMany(mappedBy = "band", cascade = CascadeType.ALL)
     private List<JoinRequest> joinRequests = new ArrayList<>();
 
+    // Per-band creator/manager -- distinct from the site-wide UserType.OWNER
+    // role. Any user, regardless of global role, owns the bands they create.
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
 }

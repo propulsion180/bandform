@@ -18,7 +18,7 @@ function ReceivedForBand({ bandId, bandName }: { bandId: string; bandName: strin
   const [acceptJoinRequest] = useMutation(ACCEPT_JOIN_REQUEST);
   const [rejectJoinRequest] = useMutation(REJECT_JOIN_REQUEST);
 
-  const pending = data?.bandJoinRequests?.filter((r) => r?.status === "PENDING") ?? [];
+  const pending = data?.bandJoinRequests?.filter((r) => r?.status === "PENDING" && !r?.invitedByBand) ?? [];
   if (pending.length === 0) return null;
 
   return (
@@ -76,35 +76,50 @@ function ReceivedForBand({ bandId, bandName }: { bandId: string; bandName: strin
 
 export default function Requests() {
   const { user } = useAuth();
-  const [tab, setTab] = useState<"sent" | "received">("sent");
+  const [tab, setTab] = useState<"requests" | "invitations" | "managing">("requests");
 
-  const { data: sentData } = useQuery(GET_USER_JOIN_REQUESTS, {
+  const { data } = useQuery(GET_USER_JOIN_REQUESTS, {
     variables: { uID: user?.id ?? "" },
-    skip: !user || tab !== "sent",
+    skip: !user,
   });
 
+  const [acceptJoinRequest] = useMutation(ACCEPT_JOIN_REQUEST);
+  const [rejectJoinRequest] = useMutation(REJECT_JOIN_REQUEST);
+
   if (!user) return null;
+
+  const myRequests = data?.userJoinRequests?.filter((r) => r && !r.invitedByBand) ?? [];
+  const myInvitations = data?.userJoinRequests?.filter((r) => r && r.invitedByBand) ?? [];
+  const ownedBands = user.bandMemberships.filter((m) => m?.band?.owner?.id === user.id);
 
   return (
     <div className="page">
       <div className="tab-row">
-        <button className={`tab-button ${tab === "sent" ? "active" : ""}`} onClick={() => setTab("sent")}>
-          Sent
+        <button className={`tab-button ${tab === "requests" ? "active" : ""}`} onClick={() => setTab("requests")}>
+          My Requests
         </button>
         <button
-          className={`tab-button ${tab === "received" ? "active" : ""}`}
-          onClick={() => setTab("received")}
+          className={`tab-button ${tab === "invitations" ? "active" : ""}`}
+          onClick={() => setTab("invitations")}
         >
-          Received
+          My Invitations
         </button>
+        {ownedBands.length > 0 && (
+          <button
+            className={`tab-button ${tab === "managing" ? "active" : ""}`}
+            onClick={() => setTab("managing")}
+          >
+            Managing
+          </button>
+        )}
       </div>
 
-      {tab === "sent" && (
+      {tab === "requests" && (
         <>
-          {(sentData?.userJoinRequests?.length ?? 0) === 0 && (
+          {myRequests.length === 0 && (
             <p className="empty-state">You haven't requested to join any bands yet.</p>
           )}
-          {sentData?.userJoinRequests?.map((request) =>
+          {myRequests.map((request) =>
             request ? (
               <div key={request.id} className="card" style={{ marginBottom: "var(--space-2)" }}>
                 <Link to={`/band/${request.band.id}`}>
@@ -118,12 +133,50 @@ export default function Requests() {
         </>
       )}
 
-      {tab === "received" && (
+      {tab === "invitations" && (
         <>
-          {user.bandMemberships.length === 0 && (
+          {myInvitations.length === 0 && <p className="empty-state">No invitations yet.</p>}
+          {myInvitations.map((request) =>
+            request ? (
+              <div key={request.id} className="card" style={{ marginBottom: "var(--space-2)" }}>
+                <Link to={`/band/${request.band.id}`}>
+                  <strong>{request.band.name}</strong>
+                </Link>{" "}
+                invited you{request.proposedRole ? ` as ${request.proposedRole}` : ""}{" "}
+                <span className={`badge ${statusBadgeClass[request.status]}`}>{request.status}</span>
+                <p>{request.message}</p>
+                {request.status === "PENDING" && (
+                  <div className="navButtonContainer">
+                    <a
+                      className="small-button"
+                      onClick={async () => {
+                        await acceptJoinRequest({ variables: { id: request.id } });
+                      }}
+                    >
+                      Accept
+                    </a>
+                    <a
+                      className="small-button danger"
+                      onClick={async () => {
+                        await rejectJoinRequest({ variables: { id: request.id } });
+                      }}
+                    >
+                      Decline
+                    </a>
+                  </div>
+                )}
+              </div>
+            ) : null
+          )}
+        </>
+      )}
+
+      {tab === "managing" && (
+        <>
+          {ownedBands.length === 0 && (
             <p className="empty-state">You're not managing any bands yet.</p>
           )}
-          {user.bandMemberships.map((membership) =>
+          {ownedBands.map((membership) =>
             membership?.band ? (
               <ReceivedForBand key={membership.band.id} bandId={membership.band.id} bandName={membership.band.name} />
             ) : null
