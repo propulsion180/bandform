@@ -1,42 +1,48 @@
 import React from "react";
-import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, useLocation } from "react-router-dom";
 import Header from "./components/Header";
-import ProtectedRoute from "./auth/ProtectedRoute";
 import Landing from "./pages/Landing";
-import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Discover from "./pages/Discover";
-import BandDetail from "./pages/BandDetail";
-import BandCreator from "./pages/BandCreator";
-import Requests from "./pages/Requests";
-import Profile from "./pages/Profile";
-import Admin from "./pages/Admin";
+import Desktop from "./pages/Desktop";
+import MobileApp from "./pages/MobileApp";
 import { useAuth } from "./auth/AuthContext";
+import { WindowManagerProvider } from "./windows/WindowManagerContext";
+import { useIsDesktopViewport } from "./windows/useIsDesktopViewport";
 
-const App: React.FC = () => {
-  const { user } = useAuth();
+const RootSwitch: React.FC = () => {
+  const { user, loading } = useAuth();
+  const isDesktop = useIsDesktopViewport();
+  const location = useLocation();
 
-  return (
-    <Router>
-      <Header />
-      <Routes>
-        <Route path="/" element={user ? <Home /> : <Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/discover" element={<Discover />} />
-          <Route path="/band/:id" element={<BandDetail />} />
-          <Route path="/create-band" element={<BandCreator />} />
-          <Route path="/requests" element={<Requests />} />
-          <Route path="/profile" element={<Profile />} />
-        </Route>
-        <Route element={<ProtectedRoute adminOnly />}>
-          <Route path="/admin" element={<Admin />} />
-        </Route>
-      </Routes>
-    </Router>
-  );
+  if (loading) {
+    return <div className="page">Loading...</div>;
+  }
+
+  if (location.pathname === "/login") return <Login />;
+  if (location.pathname === "/signup") return <Signup />;
+
+  if (!user) {
+    if (location.pathname === "/") {
+      return (
+        <>
+          <Header />
+          <Landing />
+        </>
+      );
+    }
+    return <Navigate to="/login" replace />;
+  }
+
+  return isDesktop ? <Desktop /> : <MobileApp />;
 };
+
+const App: React.FC = () => (
+  <Router>
+    <WindowManagerProvider>
+      <RootSwitch />
+    </WindowManagerProvider>
+  </Router>
+);
 
 export default App;

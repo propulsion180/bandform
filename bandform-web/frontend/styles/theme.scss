@@ -20,6 +20,9 @@
   --color-warning-muted: #fef3c7;
   --color-danger: #dc2626;
   --color-danger-muted: #fee2e2;
+
+  --window-titlebar-bg: #6d28d9;
+  --window-titlebar-text: #ffffff;
 }
 
 @mixin dark-theme {
@@ -40,6 +43,9 @@
   --color-warning-muted: #3a2a0a;
   --color-danger: #f87171;
   --color-danger-muted: #3a1616;
+
+  --window-titlebar-bg: #2e1f4d;
+  --window-titlebar-text: #f4f4f5;
 }
 
 :root {

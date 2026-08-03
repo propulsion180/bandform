@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import { GET_BAND_JOIN_REQUESTS, GET_USER_JOIN_REQUESTS } from "../graphql/queries";
 import { ACCEPT_JOIN_REQUEST, REJECT_JOIN_REQUEST } from "../graphql/mutations";
 import { useAuth } from "../auth/AuthContext";
+import { useOpenBandWindow } from "../windows/WindowManagerContext";
 
 const statusBadgeClass: Record<string, string> = {
   PENDING: "badge-warning",
@@ -76,6 +77,7 @@ function ReceivedForBand({ bandId, bandName }: { bandId: string; bandName: strin
 
 export default function Requests() {
   const { user } = useAuth();
+  const openBand = useOpenBandWindow();
   const [tab, setTab] = useState<"requests" | "invitations" | "managing">("requests");
 
   const { data } = useQuery(GET_USER_JOIN_REQUESTS, {
@@ -122,7 +124,7 @@ export default function Requests() {
           {myRequests.map((request) =>
             request ? (
               <div key={request.id} className="card" style={{ marginBottom: "var(--space-2)" }}>
-                <Link to={`/band/${request.band.id}`}>
+                <Link to={`/band/${request.band.id}`} onClick={() => openBand(request.band.id)}>
                   <strong>{request.band.name}</strong>
                 </Link>{" "}
                 <span className={`badge ${statusBadgeClass[request.status]}`}>{request.status}</span>
@@ -139,7 +141,7 @@ export default function Requests() {
           {myInvitations.map((request) =>
             request ? (
               <div key={request.id} className="card" style={{ marginBottom: "var(--space-2)" }}>
-                <Link to={`/band/${request.band.id}`}>
+                <Link to={`/band/${request.band.id}`} onClick={() => openBand(request.band.id)}>
                   <strong>{request.band.name}</strong>
                 </Link>{" "}
                 invited you{request.proposedRole ? ` as ${request.proposedRole}` : ""}{" "}

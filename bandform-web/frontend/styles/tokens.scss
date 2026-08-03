@@ -17,6 +17,13 @@
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.2);
 
   --font-sans: "Fira Sans", sans-serif;
+
+  // Stacking order for the windowed UI (see windows/WindowManagerContext).
+  // Everything else in the app renders below this range.
+  --z-window-base: 100;
+  --z-window-focused: 200;
+  --z-window-nav: 300;
 }

@@ -2,11 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useApolloClient, useQuery } from "@apollo/client/react";
 import { GET_BANDS, GET_RECOMMENDED_BANDS } from "../graphql/queries";
+import { useOpenBandWindow } from "../windows/WindowManagerContext";
 
 const PAGE_SIZE = 12;
 
 export default function Discover() {
   const client = useApolloClient();
+  const openBand = useOpenBandWindow();
   const [tab, setTab] = useState<"bands" | "recommended">("bands");
   const [filter, setFilter] = useState("");
   const [visible, setVisible] = useState(PAGE_SIZE);
@@ -79,7 +81,12 @@ export default function Discover() {
 
       <div className="card-grid">
         {filtered.slice(0, visible).map((band) => (
-          <Link key={band.id} to={`/band/${band.id}`} className="card card-link">
+          <Link
+            key={band.id}
+            to={`/band/${band.id}`}
+            className="card card-link"
+            onClick={() => openBand(band.id)}
+          >
             <strong>{band.name}</strong>
             <p>
               {band.city}, {band.country}

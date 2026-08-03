@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { useApolloClient, useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import { GET_BAND, GET_BAND_JOIN_REQUESTS, GET_RECOMMENDED_USERS } from "../graphql/queries";
 import {
@@ -12,6 +11,8 @@ import {
   REJECT_JOIN_REQUEST,
 } from "../graphql/mutations";
 import { useAuth } from "../auth/AuthContext";
+import { useOpenPath } from "../windows/useOpenPath";
+import { useWindowManager } from "../windows/WindowManagerContext";
 
 const statusBadgeClass: Record<string, string> = {
   PENDING: "badge-warning",
@@ -19,10 +20,10 @@ const statusBadgeClass: Record<string, string> = {
   REJECTED: "badge-danger",
 };
 
-export default function BandDetail() {
-  const { id } = useParams<{ id: string }>();
+export default function BandDetail({ bandId: id }: { bandId: string }) {
   const client = useApolloClient();
-  const navigate = useNavigate();
+  const openPath = useOpenPath();
+  const { closeWindow } = useWindowManager();
   const { user, isAdmin } = useAuth();
   const [tab, setTab] = useState<"overview" | "manage">("overview");
   const [joinPositionId, setJoinPositionId] = useState<string | null>(null);
@@ -108,7 +109,8 @@ export default function BandDetail() {
   const handleLeaveBand = async () => {
     if (!myMembership) return;
     await deleteBandMember({ variables: { bmID: myMembership.id } });
-    navigate("/discover");
+    closeWindow(`band-detail:${id}`);
+    openPath("/discover");
   };
 
   const handleCreatePosition = async (e: React.FormEvent) => {

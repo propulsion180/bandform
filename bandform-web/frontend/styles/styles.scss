@@ -307,3 +307,100 @@ table.data-table th {
   cursor: pointer;
   color: var(--color-text);
 }
+
+// Windowed UI (see frontend/windows/) -- desktop-width dashboard canvas and
+// the draggable window chrome rendered by WindowFrame.
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.window-canvas {
+  position: relative;
+  min-height: 75vh;
+  padding: var(--space-3);
+}
+
+.window-frame {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.window-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--window-titlebar-bg);
+  color: var(--window-titlebar-text);
+  cursor: move;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.window-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.window-controls {
+  display: flex;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.window-minimize-btn,
+.window-close-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  width: 22px;
+  height: 22px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.window-close-btn:hover {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.window-body {
+  padding: var(--space-3);
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.window-pill {
+  position: fixed;
+  left: var(--space-3);
+  bottom: var(--space-3);
+  background-color: var(--window-titlebar-bg);
+  color: var(--window-titlebar-text);
+  border: none;
+  border-radius: 999px;
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+
+.widget-actions {
+  flex-direction: column;
+  align-items: stretch;
+}

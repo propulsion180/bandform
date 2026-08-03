@@ -4,10 +4,19 @@ import { useMutation } from "@apollo/client/react";
 import { CREATE_BAND, CREATE_BAND_MEMBER, CREATE_RANDOMIZED_BAND } from "../graphql/mutations";
 import { useAuth } from "../auth/AuthContext";
 import TagInput from "../components/TagInput";
+import { useOpenBandWindow, useWindowManager } from "../windows/WindowManagerContext";
 
 export default function BandCreator() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const openBand = useOpenBandWindow();
+  const { closeWindow } = useWindowManager();
+
+  const goToBand = (bandId: string) => {
+    navigate(`/band/${bandId}`);
+    openBand(bandId);
+    closeWindow("create-band");
+  };
   const [mode, setMode] = useState<"choose" | "manual" | "auto">("choose");
 
   const [name, setName] = useState("");
@@ -40,7 +49,7 @@ export default function BandCreator() {
           role: yourRole || yourInstrument,
         },
       });
-      navigate(`/band/${bandId}`);
+      goToBand(bandId);
     }
   };
 
@@ -75,7 +84,7 @@ export default function BandCreator() {
             {result.members} member{result.members === 1 ? "" : "s"} auto-added, {result.open} position
             {result.open === 1 ? "" : "s"} still open.
           </p>
-          <a className="small-button" onClick={() => navigate(`/band/${result.id}`)}>
+          <a className="small-button" onClick={() => goToBand(result.id)}>
             Go to your band
           </a>
         </div>
