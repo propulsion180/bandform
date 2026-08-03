@@ -26,10 +26,10 @@
 }
 
 @mixin dark-theme {
-  --color-bg: oklch(15% 0.016 255);
-  --color-surface: oklch(19% 0.017 255);
-  --color-surface-alt: oklch(24% 0.019 255);
-  --color-border: oklch(33% 0.022 255);
+  --color-bg: oklch(19% 0.017 255);
+  --color-surface: oklch(27% 0.019 255);
+  --color-surface-alt: oklch(36% 0.021 255);
+  --color-border: oklch(48% 0.024 255);
   --color-text: oklch(94% 0.015 88);
   --color-text-muted: oklch(80% 0.014 85);
   --color-text-faint: oklch(66% 0.012 80);
@@ -41,11 +41,13 @@
   --color-success-muted: oklch(26% 0.055 112);
   --color-warning: oklch(84% 0.171 85);
   --color-warning-muted: oklch(28% 0.055 85);
-  --color-danger: oklch(64% 0.230 28);
+  --color-danger: oklch(68% 0.204 28);
   --color-danger-muted: oklch(26% 0.080 28);
 
   --window-titlebar-bg: oklch(32% 0.077 51.7);
   --window-titlebar-text: oklch(94% 0.015 88);
+
+  --shadow-inset-sm: inset 3px 3px 5px rgba(0, 0, 0, 0.6), inset -2px -2px 3px rgba(255, 255, 255, 0.06);
 }
 
 :root {

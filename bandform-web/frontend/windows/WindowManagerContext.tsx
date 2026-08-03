@@ -15,6 +15,7 @@ export interface OpenWindow {
 interface WindowManagerContextValue {
   zIndexOf: (id: string, base?: number) => number;
   focus: (id: string) => void;
+  isFocused: (id: string) => boolean;
   isMinimized: (id: string) => boolean;
   toggleMinimize: (id: string) => void;
   openWindows: OpenWindow[];
@@ -42,6 +43,8 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
     [order]
   );
 
+  const isFocused = useCallback((id: string) => order.length > 0 && order[order.length - 1] === id, [order]);
+
   const isMinimized = useCallback((id: string) => minimized[id] ?? false, [minimized]);
 
   const toggleMinimize = useCallback((id: string) => {
@@ -63,7 +66,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
 
   return (
     <WindowManagerContext.Provider
-      value={{ zIndexOf, focus, isMinimized, toggleMinimize, openWindows, openWindow, closeWindow }}
+      value={{ zIndexOf, focus, isFocused, isMinimized, toggleMinimize, openWindows, openWindow, closeWindow }}
     >
       {children}
     </WindowManagerContext.Provider>

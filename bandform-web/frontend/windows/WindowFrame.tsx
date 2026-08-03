@@ -31,8 +31,9 @@ export default function WindowFrame({
   children,
 }: WindowFrameProps) {
   const [layout, setLayout] = useWindowLayout(id, defaultPosition, defaultSize);
-  const { zIndexOf, focus, isMinimized, toggleMinimize } = useWindowManager();
+  const { zIndexOf, focus, isFocused, isMinimized, toggleMinimize } = useWindowManager();
   const minimized = isMinimized(id);
+  const focused = isFocused(id);
   const zIndex = zIndexOf(id, baseZIndex);
 
   if (minimized && minimizedPillLabel) {
@@ -79,7 +80,7 @@ export default function WindowFrame({
       // auto do nothing and tall content silently gets clipped instead of
       // scrolling.
       style={{ zIndex, display: "flex", flexDirection: "column" }}
-      className="window-frame"
+      className={`window-frame${focused ? " window-frame--focused" : ""}`}
     >
       <div className="window-titlebar">
         <span className="window-title">{title}</span>
