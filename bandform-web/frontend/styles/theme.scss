@@ -3,49 +3,49 @@
 // <html> (set by useTheme()) overrides it and is persisted to localStorage.
 
 @mixin light-theme {
-  --color-bg: #fafafa;
-  --color-surface: #ffffff;
-  --color-surface-alt: #f4f4f5;
-  --color-border: #e4e4e7;
-  --color-text: #18181b;
-  --color-text-muted: #52525b;
-  --color-text-faint: #a1a1aa;
-  --color-accent: #6d28d9;
-  --color-accent-hover: #5b21b6;
-  --color-accent-muted: #ede9fe;
-  --color-accent-contrast: #ffffff;
-  --color-success: #16a34a;
-  --color-success-muted: #dcfce7;
-  --color-warning: #d97706;
-  --color-warning-muted: #fef3c7;
-  --color-danger: #dc2626;
-  --color-danger-muted: #fee2e2;
+  --color-bg: oklch(96% 0.012 255);
+  --color-surface: oklch(99% 0.004 255);
+  --color-surface-alt: oklch(93% 0.016 255);
+  --color-border: oklch(85% 0.020 255);
+  --color-text: oklch(22% 0.008 50);
+  --color-text-muted: oklch(42% 0.008 55);
+  --color-text-faint: oklch(58% 0.008 60);
+  --color-accent: oklch(48% 0.112 51.7);
+  --color-accent-hover: oklch(40% 0.095 51.7);
+  --color-accent-muted: oklch(93% 0.038 51.7);
+  --color-accent-contrast: oklch(100% 0 0);
+  --color-success: oklch(52% 0.112 112);
+  --color-success-muted: oklch(93% 0.050 112);
+  --color-warning: oklch(55% 0.112 80);
+  --color-warning-muted: oklch(94% 0.050 80);
+  --color-danger: oklch(50% 0.190 27);
+  --color-danger-muted: oklch(93% 0.032 27);
 
-  --window-titlebar-bg: #6d28d9;
-  --window-titlebar-text: #ffffff;
+  --window-titlebar-bg: oklch(48% 0.112 51.7);
+  --window-titlebar-text: oklch(100% 0 0);
 }
 
 @mixin dark-theme {
-  --color-bg: #121214;
-  --color-surface: #1b1b1f;
-  --color-surface-alt: #232327;
-  --color-border: #2e2e33;
-  --color-text: #f4f4f5;
-  --color-text-muted: #a1a1aa;
-  --color-text-faint: #71717a;
-  --color-accent: #a78bfa;
-  --color-accent-hover: #c4b5fd;
-  --color-accent-muted: #2e1f4d;
-  --color-accent-contrast: #18181b;
-  --color-success: #4ade80;
-  --color-success-muted: #14301f;
-  --color-warning: #fbbf24;
-  --color-warning-muted: #3a2a0a;
-  --color-danger: #f87171;
-  --color-danger-muted: #3a1616;
+  --color-bg: oklch(15% 0.016 255);
+  --color-surface: oklch(19% 0.017 255);
+  --color-surface-alt: oklch(24% 0.019 255);
+  --color-border: oklch(33% 0.022 255);
+  --color-text: oklch(94% 0.015 88);
+  --color-text-muted: oklch(80% 0.014 85);
+  --color-text-faint: oklch(66% 0.012 80);
+  --color-accent: oklch(70% 0.163 51.7);
+  --color-accent-hover: oklch(61% 0.145 51.7);
+  --color-accent-muted: oklch(28% 0.055 51.7);
+  --color-accent-contrast: oklch(16% 0.020 51.7);
+  --color-success: oklch(78% 0.172 112);
+  --color-success-muted: oklch(26% 0.055 112);
+  --color-warning: oklch(84% 0.171 85);
+  --color-warning-muted: oklch(28% 0.055 85);
+  --color-danger: oklch(64% 0.230 28);
+  --color-danger-muted: oklch(26% 0.080 28);
 
-  --window-titlebar-bg: #2e1f4d;
-  --window-titlebar-text: #f4f4f5;
+  --window-titlebar-bg: oklch(32% 0.077 51.7);
+  --window-titlebar-text: oklch(94% 0.015 88);
 }
 
 :root {
