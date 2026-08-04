@@ -11,6 +11,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,8 @@ import xyz.wmmp.bandform_backend.data.LoginResult;
 import xyz.wmmp.bandform_backend.data.User;
 import xyz.wmmp.bandform_backend.data.UserProfile;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
+import xyz.wmmp.bandform_backend.services.BandAuthorizationService;
+import xyz.wmmp.bandform_backend.services.WsTicketService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -36,6 +39,8 @@ public class AuthResolver {
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtUtil jwtUtil;
     @Autowired private UserRepository userRepository;
+    @Autowired private WsTicketService wsTicketService;
+    @Autowired private BandAuthorizationService bandAuthorizationService;
 
     @Value("${auth.cookie.secure:false}")
     private boolean secureCookie;
@@ -125,5 +130,11 @@ public class AuthResolver {
         currentResponse().addHeader(HttpHeaders.SET_COOKIE, clear.toString());
 
         return true;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @MutationMapping
+    public String issueWsTicket(){
+        return wsTicketService.issue(bandAuthorizationService.currentUserId());
     }
 }

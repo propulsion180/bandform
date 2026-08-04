@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import xyz.wmmp.bandform_backend.data.Band;
 import xyz.wmmp.bandform_backend.data.User;
 import xyz.wmmp.bandform_backend.data.UserType;
+import xyz.wmmp.bandform_backend.repositories.BandMemberRepository;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
 
 /**
@@ -20,18 +21,24 @@ import xyz.wmmp.bandform_backend.repositories.UserRepository;
 public class BandAuthorizationService {
 
     private final UserRepository userRepository;
+    private final BandMemberRepository bandMemberRepository;
 
-    public BandAuthorizationService(UserRepository userRepository) {
+    public BandAuthorizationService(UserRepository userRepository, BandMemberRepository bandMemberRepository) {
         this.userRepository = userRepository;
+        this.bandMemberRepository = bandMemberRepository;
     }
 
     public Long currentUserId() {
         return Long.parseLong((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
 
-    public boolean isGlobalAdmin() {
-        User caller = userRepository.findById(currentUserId()).orElseThrow();
+    public boolean isGlobalAdmin(Long userId) {
+        User caller = userRepository.findById(userId).orElseThrow();
         return caller.getRole() == UserType.ADMIN || caller.getRole() == UserType.OWNER;
+    }
+
+    public boolean isGlobalAdmin() {
+        return isGlobalAdmin(currentUserId());
     }
 
     public boolean isSelf(Long userId) {
@@ -40,6 +47,15 @@ public class BandAuthorizationService {
 
     public boolean isBandManager(Band band) {
         return (band.getOwner() != null && band.getOwner().getId().equals(currentUserId())) || isGlobalAdmin();
+    }
+
+    public boolean isBandMember(Band band, Long userId) {
+        return isGlobalAdmin(userId)
+                || bandMemberRepository.findByBandIdAndUserId(band.getId(), userId).isPresent();
+    }
+
+    public boolean isBandMember(Band band) {
+        return isBandMember(band, currentUserId());
     }
 
     public void requireSelf(Long userId) {
@@ -52,5 +68,15 @@ public class BandAuthorizationService {
         if (!isBandManager(band)) {
             throw new AccessDeniedException("Only the band owner or a site admin can do this.");
         }
+    }
+
+    public void requireBandMember(Band band, Long userId) {
+        if (!isBandMember(band, userId)) {
+            throw new AccessDeniedException("You must be a member of this band to do this.");
+        }
+    }
+
+    public void requireBandMember(Band band) {
+        requireBandMember(band, currentUserId());
     }
 }

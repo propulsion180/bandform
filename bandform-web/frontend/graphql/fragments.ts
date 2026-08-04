@@ -96,6 +96,18 @@ export const UserCardFields = graphql(`
   }
 `);
 
+export const MessageFields = graphql(`
+  fragment MessageFields on Message {
+    id
+    body
+    sentAt
+    sender {
+      id
+      name
+    }
+  }
+`);
+
 export const MeFields = graphql(`
   fragment MeFields on User {
     id

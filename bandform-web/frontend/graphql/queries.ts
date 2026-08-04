@@ -84,6 +84,14 @@ export const GET_RECOMMENDED_USERS = graphql(`
   }
 `);
 
+export const GET_BAND_MESSAGES = graphql(`
+  query GetBandMessages($bandId: ID!, $limit: Int, $before: ID) {
+    bandMessages(bandId: $bandId, limit: $limit, before: $before) {
+      ...MessageFields
+    }
+  }
+`);
+
 export const GET_ADMIN_USERS = graphql(`
   query GetAdminUsers {
     users {

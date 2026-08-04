@@ -18,6 +18,7 @@ type Documents = {
     "\n  fragment BandDetailFields on Band {\n    id\n    name\n    description\n    city\n    country\n    owner {\n      id\n      name\n    }\n    genres {\n      name\n    }\n    members {\n      id\n      role\n      user {\n        id\n        name\n      }\n      instruments {\n        name\n      }\n    }\n    openPositions {\n      id\n      description\n      filled\n      instrument {\n        id\n        name\n      }\n      filledBy {\n        id\n        name\n      }\n    }\n  }\n": typeof types.BandDetailFieldsFragmentDoc,
     "\n  fragment BandJoinRequestFields on JoinRequest {\n    id\n    status\n    message\n    requestedDate\n    invitedByBand\n    proposedRole\n    user {\n      id\n      name\n    }\n    position {\n      id\n      instrument {\n        name\n      }\n    }\n    interestedInstruments {\n      name\n    }\n  }\n": typeof types.BandJoinRequestFieldsFragmentDoc,
     "\n  fragment UserCardFields on User {\n    id\n    name\n    city\n    country\n    instruments {\n      name\n    }\n    genres {\n      name\n    }\n  }\n": typeof types.UserCardFieldsFragmentDoc,
+    "\n  fragment MessageFields on Message {\n    id\n    body\n    sentAt\n    sender {\n      id\n      name\n    }\n  }\n": typeof types.MessageFieldsFragmentDoc,
     "\n  fragment MeFields on User {\n    id\n    name\n    email\n    age\n    city\n    country\n    description\n    role\n    status\n    genres {\n      name\n    }\n    instruments {\n      name\n    }\n    bandMemberships {\n      id\n      role\n      joinedDate\n      band {\n        id\n        name\n        owner {\n          id\n        }\n      }\n    }\n  }\n": typeof types.MeFieldsFragmentDoc,
     "\n  mutation Login($name: String!, $password: String!) {\n    login(name: $name, password: $password) {\n      user {\n        ...MeFields\n      }\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
@@ -38,6 +39,8 @@ type Documents = {
     "\n  mutation DeleteJoinRequest($id: ID!) {\n    deleteJoinRequest(id: $id)\n  }\n": typeof types.DeleteJoinRequestDocument,
     "\n  mutation RejectJoinRequest($id: ID!) {\n    reject(id: $id)\n  }\n": typeof types.RejectJoinRequestDocument,
     "\n  mutation AcceptJoinRequest($id: ID!, $bandRole: String) {\n    accept(id: $id, bandRole: $bandRole)\n  }\n": typeof types.AcceptJoinRequestDocument,
+    "\n  mutation SendMessage($bandId: ID!, $body: String!) {\n    sendMessage(bandId: $bandId, body: $body) {\n      ...MessageFields\n    }\n  }\n": typeof types.SendMessageDocument,
+    "\n  mutation IssueWsTicket {\n    issueWsTicket\n  }\n": typeof types.IssueWsTicketDocument,
     "\n  mutation CreateRandomizedBand(\n    $yourUID: ID!\n    $yourInstrument: String!\n    $yourRole: String\n    $name: String!\n    $instruments: [String!]!\n    $city: String!\n    $country: String!\n    $genres: [String!]!\n    $description: String!\n    $instrumentSearchDepth: Int!\n  ) {\n    randomizedBandCreator(\n      yourUID: $yourUID\n      yourInstrument: $yourInstrument\n      yourRole: $yourRole\n      name: $name\n      instruments: $instruments\n      city: $city\n      country: $country\n      genres: $genres\n      description: $description\n      instrumentSearchDepth: $instrumentSearchDepth\n    ) {\n      id\n      name\n      members {\n        id\n      }\n      openPositions {\n        id\n      }\n    }\n  }\n": typeof types.CreateRandomizedBandDocument,
     "\n  query GetMe {\n    me {\n      ...MeFields\n    }\n  }\n": typeof types.GetMeDocument,
     "\n  query GetBands {\n    bands {\n      ...BandCardFields\n    }\n  }\n": typeof types.GetBandsDocument,
@@ -46,14 +49,17 @@ type Documents = {
     "\n  query GetBandJoinRequests($bID: ID!) {\n    bandJoinRequests(bID: $bID) {\n      ...BandJoinRequestFields\n    }\n  }\n": typeof types.GetBandJoinRequestsDocument,
     "\n  query GetUserJoinRequests($uID: ID!) {\n    userJoinRequests(uID: $uID) {\n      ...BandJoinRequestFields\n      band {\n        id\n        name\n      }\n    }\n  }\n": typeof types.GetUserJoinRequestsDocument,
     "\n  query GetRecommendedUsers(\n    $bp: ID!\n    $withinCity: Boolean!\n    $withinCountry: Boolean!\n    $sameGenre: Boolean!\n    $singleInstrument: Boolean!\n    $locGenreWeight: Int!\n  ) {\n    recommendUser(\n      bp: $bp\n      withinCity: $withinCity\n      withinCountry: $withinCountry\n      sameGenre: $sameGenre\n      singleInstrument: $singleInstrument\n      locGenreWeight: $locGenreWeight\n    ) {\n      ...UserCardFields\n    }\n  }\n": typeof types.GetRecommendedUsersDocument,
+    "\n  query GetBandMessages($bandId: ID!, $limit: Int, $before: ID) {\n    bandMessages(bandId: $bandId, limit: $limit, before: $before) {\n      ...MessageFields\n    }\n  }\n": typeof types.GetBandMessagesDocument,
     "\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n    }\n  }\n": typeof types.GetAdminUsersDocument,
     "\n  query GetAdminBands {\n    bands {\n      id\n      name\n      city\n      country\n    }\n  }\n": typeof types.GetAdminBandsDocument,
+    "\n  subscription BandMessageAdded($bandId: ID!, $ticket: String!) {\n    messageAdded(bandId: $bandId, ticket: $ticket) {\n      ...MessageFields\n    }\n  }\n": typeof types.BandMessageAddedDocument,
 };
 const documents: Documents = {
     "\n  fragment BandCardFields on Band {\n    id\n    name\n    city\n    country\n    genres {\n      name\n    }\n    openPositions {\n      id\n      filled\n    }\n  }\n": types.BandCardFieldsFragmentDoc,
     "\n  fragment BandDetailFields on Band {\n    id\n    name\n    description\n    city\n    country\n    owner {\n      id\n      name\n    }\n    genres {\n      name\n    }\n    members {\n      id\n      role\n      user {\n        id\n        name\n      }\n      instruments {\n        name\n      }\n    }\n    openPositions {\n      id\n      description\n      filled\n      instrument {\n        id\n        name\n      }\n      filledBy {\n        id\n        name\n      }\n    }\n  }\n": types.BandDetailFieldsFragmentDoc,
     "\n  fragment BandJoinRequestFields on JoinRequest {\n    id\n    status\n    message\n    requestedDate\n    invitedByBand\n    proposedRole\n    user {\n      id\n      name\n    }\n    position {\n      id\n      instrument {\n        name\n      }\n    }\n    interestedInstruments {\n      name\n    }\n  }\n": types.BandJoinRequestFieldsFragmentDoc,
     "\n  fragment UserCardFields on User {\n    id\n    name\n    city\n    country\n    instruments {\n      name\n    }\n    genres {\n      name\n    }\n  }\n": types.UserCardFieldsFragmentDoc,
+    "\n  fragment MessageFields on Message {\n    id\n    body\n    sentAt\n    sender {\n      id\n      name\n    }\n  }\n": types.MessageFieldsFragmentDoc,
     "\n  fragment MeFields on User {\n    id\n    name\n    email\n    age\n    city\n    country\n    description\n    role\n    status\n    genres {\n      name\n    }\n    instruments {\n      name\n    }\n    bandMemberships {\n      id\n      role\n      joinedDate\n      band {\n        id\n        name\n        owner {\n          id\n        }\n      }\n    }\n  }\n": types.MeFieldsFragmentDoc,
     "\n  mutation Login($name: String!, $password: String!) {\n    login(name: $name, password: $password) {\n      user {\n        ...MeFields\n      }\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
@@ -74,6 +80,8 @@ const documents: Documents = {
     "\n  mutation DeleteJoinRequest($id: ID!) {\n    deleteJoinRequest(id: $id)\n  }\n": types.DeleteJoinRequestDocument,
     "\n  mutation RejectJoinRequest($id: ID!) {\n    reject(id: $id)\n  }\n": types.RejectJoinRequestDocument,
     "\n  mutation AcceptJoinRequest($id: ID!, $bandRole: String) {\n    accept(id: $id, bandRole: $bandRole)\n  }\n": types.AcceptJoinRequestDocument,
+    "\n  mutation SendMessage($bandId: ID!, $body: String!) {\n    sendMessage(bandId: $bandId, body: $body) {\n      ...MessageFields\n    }\n  }\n": types.SendMessageDocument,
+    "\n  mutation IssueWsTicket {\n    issueWsTicket\n  }\n": types.IssueWsTicketDocument,
     "\n  mutation CreateRandomizedBand(\n    $yourUID: ID!\n    $yourInstrument: String!\n    $yourRole: String\n    $name: String!\n    $instruments: [String!]!\n    $city: String!\n    $country: String!\n    $genres: [String!]!\n    $description: String!\n    $instrumentSearchDepth: Int!\n  ) {\n    randomizedBandCreator(\n      yourUID: $yourUID\n      yourInstrument: $yourInstrument\n      yourRole: $yourRole\n      name: $name\n      instruments: $instruments\n      city: $city\n      country: $country\n      genres: $genres\n      description: $description\n      instrumentSearchDepth: $instrumentSearchDepth\n    ) {\n      id\n      name\n      members {\n        id\n      }\n      openPositions {\n        id\n      }\n    }\n  }\n": types.CreateRandomizedBandDocument,
     "\n  query GetMe {\n    me {\n      ...MeFields\n    }\n  }\n": types.GetMeDocument,
     "\n  query GetBands {\n    bands {\n      ...BandCardFields\n    }\n  }\n": types.GetBandsDocument,
@@ -82,8 +90,10 @@ const documents: Documents = {
     "\n  query GetBandJoinRequests($bID: ID!) {\n    bandJoinRequests(bID: $bID) {\n      ...BandJoinRequestFields\n    }\n  }\n": types.GetBandJoinRequestsDocument,
     "\n  query GetUserJoinRequests($uID: ID!) {\n    userJoinRequests(uID: $uID) {\n      ...BandJoinRequestFields\n      band {\n        id\n        name\n      }\n    }\n  }\n": types.GetUserJoinRequestsDocument,
     "\n  query GetRecommendedUsers(\n    $bp: ID!\n    $withinCity: Boolean!\n    $withinCountry: Boolean!\n    $sameGenre: Boolean!\n    $singleInstrument: Boolean!\n    $locGenreWeight: Int!\n  ) {\n    recommendUser(\n      bp: $bp\n      withinCity: $withinCity\n      withinCountry: $withinCountry\n      sameGenre: $sameGenre\n      singleInstrument: $singleInstrument\n      locGenreWeight: $locGenreWeight\n    ) {\n      ...UserCardFields\n    }\n  }\n": types.GetRecommendedUsersDocument,
+    "\n  query GetBandMessages($bandId: ID!, $limit: Int, $before: ID) {\n    bandMessages(bandId: $bandId, limit: $limit, before: $before) {\n      ...MessageFields\n    }\n  }\n": types.GetBandMessagesDocument,
     "\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n    }\n  }\n": types.GetAdminUsersDocument,
     "\n  query GetAdminBands {\n    bands {\n      id\n      name\n      city\n      country\n    }\n  }\n": types.GetAdminBandsDocument,
+    "\n  subscription BandMessageAdded($bandId: ID!, $ticket: String!) {\n    messageAdded(bandId: $bandId, ticket: $ticket) {\n      ...MessageFields\n    }\n  }\n": types.BandMessageAddedDocument,
 };
 
 /**
@@ -116,6 +126,10 @@ export function graphql(source: "\n  fragment BandJoinRequestFields on JoinReque
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  fragment UserCardFields on User {\n    id\n    name\n    city\n    country\n    instruments {\n      name\n    }\n    genres {\n      name\n    }\n  }\n"): (typeof documents)["\n  fragment UserCardFields on User {\n    id\n    name\n    city\n    country\n    instruments {\n      name\n    }\n    genres {\n      name\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment MessageFields on Message {\n    id\n    body\n    sentAt\n    sender {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  fragment MessageFields on Message {\n    id\n    body\n    sentAt\n    sender {\n      id\n      name\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -199,6 +213,14 @@ export function graphql(source: "\n  mutation AcceptJoinRequest($id: ID!, $bandR
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation SendMessage($bandId: ID!, $body: String!) {\n    sendMessage(bandId: $bandId, body: $body) {\n      ...MessageFields\n    }\n  }\n"): (typeof documents)["\n  mutation SendMessage($bandId: ID!, $body: String!) {\n    sendMessage(bandId: $bandId, body: $body) {\n      ...MessageFields\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation IssueWsTicket {\n    issueWsTicket\n  }\n"): (typeof documents)["\n  mutation IssueWsTicket {\n    issueWsTicket\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation CreateRandomizedBand(\n    $yourUID: ID!\n    $yourInstrument: String!\n    $yourRole: String\n    $name: String!\n    $instruments: [String!]!\n    $city: String!\n    $country: String!\n    $genres: [String!]!\n    $description: String!\n    $instrumentSearchDepth: Int!\n  ) {\n    randomizedBandCreator(\n      yourUID: $yourUID\n      yourInstrument: $yourInstrument\n      yourRole: $yourRole\n      name: $name\n      instruments: $instruments\n      city: $city\n      country: $country\n      genres: $genres\n      description: $description\n      instrumentSearchDepth: $instrumentSearchDepth\n    ) {\n      id\n      name\n      members {\n        id\n      }\n      openPositions {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CreateRandomizedBand(\n    $yourUID: ID!\n    $yourInstrument: String!\n    $yourRole: String\n    $name: String!\n    $instruments: [String!]!\n    $city: String!\n    $country: String!\n    $genres: [String!]!\n    $description: String!\n    $instrumentSearchDepth: Int!\n  ) {\n    randomizedBandCreator(\n      yourUID: $yourUID\n      yourInstrument: $yourInstrument\n      yourRole: $yourRole\n      name: $name\n      instruments: $instruments\n      city: $city\n      country: $country\n      genres: $genres\n      description: $description\n      instrumentSearchDepth: $instrumentSearchDepth\n    ) {\n      id\n      name\n      members {\n        id\n      }\n      openPositions {\n        id\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -231,11 +253,19 @@ export function graphql(source: "\n  query GetRecommendedUsers(\n    $bp: ID!\n 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query GetBandMessages($bandId: ID!, $limit: Int, $before: ID) {\n    bandMessages(bandId: $bandId, limit: $limit, before: $before) {\n      ...MessageFields\n    }\n  }\n"): (typeof documents)["\n  query GetBandMessages($bandId: ID!, $limit: Int, $before: ID) {\n    bandMessages(bandId: $bandId, limit: $limit, before: $before) {\n      ...MessageFields\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n    }\n  }\n"): (typeof documents)["\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query GetAdminBands {\n    bands {\n      id\n      name\n      city\n      country\n    }\n  }\n"): (typeof documents)["\n  query GetAdminBands {\n    bands {\n      id\n      name\n      city\n      country\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  subscription BandMessageAdded($bandId: ID!, $ticket: String!) {\n    messageAdded(bandId: $bandId, ticket: $ticket) {\n      ...MessageFields\n    }\n  }\n"): (typeof documents)["\n  subscription BandMessageAdded($bandId: ID!, $ticket: String!) {\n    messageAdded(bandId: $bandId, ticket: $ticket) {\n      ...MessageFields\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

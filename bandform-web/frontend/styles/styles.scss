@@ -324,6 +324,59 @@ table.data-table th {
   text-align: center;
 }
 
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.chat-bubble {
+  align-self: flex-start;
+  max-width: 70%;
+  background-color: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+
+.chat-bubble.own {
+  align-self: flex-end;
+  background-color: var(--color-accent-muted);
+  border-color: var(--color-accent);
+}
+
+.chat-sender {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.chat-input-row .form-input {
+  flex: 1;
+}
+
 .theme-toggle {
   background: none;
   border: 1px solid var(--color-border);

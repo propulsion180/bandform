@@ -35,7 +35,13 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/graphql").permitAll()
+                        // /graphql-ws is permitAll at this layer because the session
+                        // cookie can't be relied on to arrive on the WS handshake
+                        // (browsers inconsistently attach SameSite cookies to
+                        // cross-port WebSocket upgrades) -- auth for it is instead
+                        // enforced per-subscription via WsTicketService, inside
+                        // MessageSubscriptionResolver.
+                        .requestMatchers("/graphql", "/graphql-ws").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

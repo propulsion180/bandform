@@ -13,6 +13,7 @@ import {
 import { useAuth } from "../auth/AuthContext";
 import { useOpenPath } from "../windows/useOpenPath";
 import { useWindowManager } from "../windows/WindowManagerContext";
+import BandChat from "../components/BandChat";
 
 const statusBadgeClass: Record<string, string> = {
   PENDING: "badge-warning",
@@ -25,7 +26,7 @@ export default function BandDetail({ bandId: id }: { bandId: string }) {
   const openPath = useOpenPath();
   const { closeWindow } = useWindowManager();
   const { user, isAdmin } = useAuth();
-  const [tab, setTab] = useState<"overview" | "manage">("overview");
+  const [tab, setTab] = useState<"overview" | "chat" | "manage">("overview");
   const [joinPositionId, setJoinPositionId] = useState<string | null>(null);
   const [joinMessage, setJoinMessage] = useState("");
   const [newPositionInstrument, setNewPositionInstrument] = useState("");
@@ -182,6 +183,14 @@ export default function BandDetail({ bandId: id }: { bandId: string }) {
         >
           Overview
         </button>
+        {isMember && (
+          <button
+            className={`tab-button ${tab === "chat" ? "active" : ""}`}
+            onClick={() => setTab("chat")}
+          >
+            Chat
+          </button>
+        )}
         {isOwner && (
           <button
             className={`tab-button ${tab === "manage" ? "active" : ""}`}
@@ -255,6 +264,8 @@ export default function BandDetail({ bandId: id }: { bandId: string }) {
             ))}
         </>
       )}
+
+      {tab === "chat" && isMember && <BandChat bandId={id} />}
 
       {tab === "manage" && isOwner && (
         <>

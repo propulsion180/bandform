@@ -102,6 +102,14 @@ type Notification {
     sender: String!
 }
 
+type Message {
+    id: ID!
+    band: Band!
+    sender: User!
+    body: String!
+    sentAt: String!
+}
+
 type Query {
     me: User
     users: [User!]!
@@ -116,6 +124,7 @@ type Query {
     bandJoinRequests(bID: ID!): [JoinRequest!]
     recommendBand(withinCity: Boolean!, withinCountry: Boolean!, sameGenre: Boolean!, locGenreWeight: Int!): [Band!]!
     recommendUser(bp: ID!, withinCity: Boolean!, withinCountry: Boolean!, sameGenre: Boolean!, singleInstrument: Boolean!, locGenreWeight: Int!): [User!]!
+    bandMessages(bandId: ID!, limit: Int, before: ID): [Message!]!
 }
 
 type Mutation {
@@ -232,8 +241,13 @@ type Mutation {
         description: String!
         instrumentSearchDepth: Int!
     ): Band!
+
+    sendMessage(bandId: ID!, body: String!): Message!
+
+    issueWsTicket: String!
 }
 
 type Subscription {
     notifications: Notification!
+    messageAdded(bandId: ID!, ticket: String!): Message!
 }

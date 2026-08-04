@@ -257,6 +257,20 @@ export const ACCEPT_JOIN_REQUEST = graphql(`
   }
 `);
 
+export const SEND_MESSAGE = graphql(`
+  mutation SendMessage($bandId: ID!, $body: String!) {
+    sendMessage(bandId: $bandId, body: $body) {
+      ...MessageFields
+    }
+  }
+`);
+
+export const ISSUE_WS_TICKET = graphql(`
+  mutation IssueWsTicket {
+    issueWsTicket
+  }
+`);
+
 export const CREATE_RANDOMIZED_BAND = graphql(`
   mutation CreateRandomizedBand(
     $yourUID: ID!
