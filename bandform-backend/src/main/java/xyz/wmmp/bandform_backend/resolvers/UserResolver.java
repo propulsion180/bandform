@@ -53,9 +53,10 @@ public class UserResolver{
             @Argument String country,
             @Argument String description,
             @Argument List<String> genres,
-            @Argument List<String> instruments
+            @Argument List<String> instruments,
+            @Argument UserStatus status
     ){
-        return userService.createUser(name, email, plainPassword, age, city, country, description, genres, instruments);
+        return userService.createUser(name, email, plainPassword, age, city, country, description, genres, instruments, status);
     }
 
 

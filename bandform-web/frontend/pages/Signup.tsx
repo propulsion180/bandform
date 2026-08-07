@@ -3,6 +3,8 @@ import { useMutation } from "@apollo/client/react";
 import { useNavigate } from "react-router-dom";
 import { SIGNUP } from "../graphql/mutations";
 import TagInput from "../components/TagInput";
+import { NOT_IN_BAND_STATUS_OPTIONS } from "../constants/userStatus";
+import { UserStatus } from "../gql/graphql";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ export default function Signup() {
   const [description, setDescription] = useState<string>("");
   const [genres, setGenres] = useState<string[]>([]);
   const [instruments, setInstruments] = useState<string[]>([]);
+  const [status, setStatus] = useState<UserStatus>("NOBANDSEL");
   const [err, setErr] = useState("");
   const [createUser, { loading }] = useMutation(SIGNUP);
 
@@ -34,6 +37,7 @@ export default function Signup() {
           description,
           genres,
           instruments,
+          status,
         },
       });
 
@@ -129,6 +133,24 @@ export default function Signup() {
             onChange={(e) => setDescription(e.target.value)}
             required
           />
+        </div>
+        <div>
+          <label htmlFor="status">How do you want to be matched?</label>
+          <select
+            className="form-select"
+            id="status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as UserStatus)}
+          >
+            {NOT_IN_BAND_STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <p className="field-hint">
+            {NOT_IN_BAND_STATUS_OPTIONS.find((option) => option.value === status)?.description}
+          </p>
         </div>
         <TagInput
           label="Genres you play"

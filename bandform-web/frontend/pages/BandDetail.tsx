@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useApolloClient, useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
-import { GET_BAND, GET_BAND_JOIN_REQUESTS, GET_RECOMMENDED_USERS } from "../graphql/queries";
+import { GET_BAND, GET_BAND_JOIN_REQUESTS, GET_RECOMMENDED_USERS, GET_USER_JOIN_REQUESTS } from "../graphql/queries";
 import {
   ACCEPT_JOIN_REQUEST,
   CREATE_BAND_POSITION,
@@ -101,6 +101,7 @@ export default function BandDetail({ bandId: id }: { bandId: string }) {
         interestedInstruments: myInstruments,
         message: joinMessage,
       },
+      refetchQueries: [{ query: GET_USER_JOIN_REQUESTS, variables: { uID: user.id } }],
     });
     setJoinPositionId(null);
     setJoinMessage("");

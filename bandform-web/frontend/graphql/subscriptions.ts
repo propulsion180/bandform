@@ -7,3 +7,13 @@ export const BAND_MESSAGE_ADDED = graphql(`
     }
   }
 `);
+
+export const NOTIFICATIONS = graphql(`
+  subscription Notifications($ticket: String!) {
+    notifications(ticket: $ticket) {
+      id
+      message
+      sender
+    }
+  }
+`);

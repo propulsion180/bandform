@@ -27,6 +27,7 @@ export const SIGNUP = graphql(`
     $description: String!
     $genres: [String!]!
     $instruments: [String!]!
+    $status: UserStatus
   ) {
     createUser(
       name: $name
@@ -38,6 +39,7 @@ export const SIGNUP = graphql(`
       description: $description
       genres: $genres
       instruments: $instruments
+      status: $status
     ) {
       id
       name

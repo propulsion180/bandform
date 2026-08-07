@@ -73,7 +73,7 @@ public class UserService {
         return id;
     }
 
-    public UserProfile createUser(String name, String email, String plainPassword, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
+    public UserProfile createUser(String name, String email, String plainPassword, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames, UserStatus status){
         log.debug("Creating user");
         if(userRepository.findByName(name).isPresent()){ throw new IllegalArgumentException("UserName already taken"); }
         User u = new User();
@@ -90,6 +90,12 @@ public class UserService {
         u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));
         u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));
         u.setRole(UserType.NORMAL);
+        if(status != null){
+            if(status != UserStatus.NOBANDRAND && status != UserStatus.NOBANDSEL){
+                throw new IllegalArgumentException("A new user has no band yet; status must be NOBANDRAND or NOBANDSEL");
+            }
+            u.setStatus(status);
+        }
         return UserProfile.from(userRepository.save(u));
     }
 
@@ -114,7 +120,16 @@ public class UserService {
        if(city != null && !city.isBlank()){u.setCity(city);}
        if(country != null && !country.isBlank()){u.setCountry(country);}
        if(desc != null && !desc.isBlank()){u.setDescription(desc);}
-       if(status != null){u.setStatus(status);}
+       if(status != null){
+           boolean inBand = !u.getBandMemberships().isEmpty();
+           boolean statusIsInBand = status == UserStatus.BAND || status == UserStatus.BANDRAND || status == UserStatus.BANDSEL;
+           if(inBand != statusIsInBand){
+               throw new IllegalArgumentException(inBand
+                       ? "User is in a band; status must be BAND, BANDRAND, or BANDSEL"
+                       : "User is not in a band; status must be NOBANDRAND or NOBANDSEL");
+           }
+           u.setStatus(status);
+       }
        if(genreNames != null){u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));}
        if(instrumentNames != null){u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));}
        if(memberships != null){u.setBandMemberships(memberships);}

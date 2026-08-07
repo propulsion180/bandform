@@ -145,7 +145,7 @@ public class DevDataSeeder implements CommandLineRunner {
 
     private User createUser(String name, String email, String city, String country, String description,
                              List<String> genres, List<String> instruments) {
-        userService.createUser(name, email, PASSWORD, DEFAULT_AGE, city, country, description, genres, instruments);
+        userService.createUser(name, email, PASSWORD, DEFAULT_AGE, city, country, description, genres, instruments, null);
         return userRepository.findByName(name).orElseThrow();
     }
 

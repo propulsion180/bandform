@@ -4,6 +4,8 @@ import { CHANGE_PASSWORD, UPDATE_USER } from "../graphql/mutations";
 import { useAuth } from "../auth/AuthContext";
 import TagInput from "../components/TagInput";
 import { useNavigate } from "react-router-dom";
+import { NOT_IN_BAND_STATUS_OPTIONS, IN_BAND_STATUS_OPTIONS } from "../constants/userStatus";
+import { UserStatus } from "../gql/graphql";
 
 export default function Profile() {
   const { user, setUser } = useAuth();
@@ -13,6 +15,7 @@ export default function Profile() {
   const [city, setCity] = useState(user?.city ?? "");
   const [country, setCountry] = useState(user?.country ?? "");
   const [description, setDescription] = useState(user?.description ?? "");
+  const [status, setStatus] = useState<UserStatus>(user?.status ?? "NOBANDSEL");
   const [genres, setGenres] = useState<string[]>((user?.genres.map((g) => g?.name).filter(Boolean) as string[]) ?? []);
   const [instruments, setInstruments] = useState<string[]>(
     (user?.instruments.map((i) => i?.name).filter(Boolean) as string[]) ?? []
@@ -32,9 +35,9 @@ export default function Profile() {
     setSaved(false);
     try {
       await updateUser({
-        variables: { id: user.id, name, email, city, country, description, genres, instruments },
+        variables: { id: user.id, name, email, city, country, description, status, genres, instruments },
       });
-      setUser({ ...user, name, email, city, country, description });
+      setUser({ ...user, name, email, city, country, description, status });
       setSaved(true);
     } catch (error) {
       setErr(error instanceof Error ? error.message : "Could not save changes.");
@@ -86,6 +89,28 @@ export default function Profile() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+        </div>
+        <div>
+          <label htmlFor="status">How do you want to be matched?</label>
+          <select
+            className="form-select"
+            id="status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as UserStatus)}
+          >
+            {(user.bandMemberships.length === 0 ? NOT_IN_BAND_STATUS_OPTIONS : IN_BAND_STATUS_OPTIONS).map(
+              (option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              )
+            )}
+          </select>
+          <p className="field-hint">
+            {(user.bandMemberships.length === 0 ? NOT_IN_BAND_STATUS_OPTIONS : IN_BAND_STATUS_OPTIONS).find(
+              (option) => option.value === status
+            )?.description}
+          </p>
         </div>
         <TagInput label="Genres" values={genres} onChange={setGenres} placeholder="Type a genre, press Enter" />
         <TagInput

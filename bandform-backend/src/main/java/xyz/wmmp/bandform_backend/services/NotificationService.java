@@ -22,6 +22,10 @@ public class NotificationService{
   }
 
 
+  public List<Notification> getUnreadNotifications(Long userId){
+    return notificationRepository.findByUserIdAndReadFalse(userId);
+  }
+
   public Notification createNotification(User u, String sender, String message){
     Notification n = new Notification();
 

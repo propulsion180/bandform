@@ -138,6 +138,7 @@ type Mutation {
         description: String!
         genres: [String!]!
         instruments: [String!]!
+        status: UserStatus
     ): User!
 
     updateUser(
@@ -248,6 +249,6 @@ type Mutation {
 }
 
 type Subscription {
-    notifications: Notification!
+    notifications(ticket: String!): Notification!
     messageAdded(bandId: ID!, ticket: String!): Message!
 }

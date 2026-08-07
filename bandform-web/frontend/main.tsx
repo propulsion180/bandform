@@ -8,6 +8,7 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { createClient } from "graphql-ws";
 import { AuthProvider } from "./auth/AuthContext";
+import NotificationListener from "./components/NotificationListener";
 
 const httpLink = new HttpLink({
   uri: "http://localhost:8080/graphql",
@@ -49,6 +50,7 @@ ReactDOM.createRoot(document.querySelector("#index")!).render(
   <ApolloProvider client={client}>
     <React.StrictMode>
       <AuthProvider>
+        <NotificationListener />
         <App />
       </AuthProvider>
     </React.StrictMode>
