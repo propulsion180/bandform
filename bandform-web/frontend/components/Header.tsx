@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client/react";
 import { LOGOUT } from "../graphql/mutations";
 import { useAuth } from "../auth/AuthContext";
@@ -8,6 +8,7 @@ import { useOpenPath } from "../windows/useOpenPath";
 
 export function NavLinks() {
   const navigate = useNavigate();
+  const location = useLocation();
   const openPath = useOpenPath();
   const { user, isAdmin, setUser } = useAuth();
   const { theme, toggle } = useTheme();
@@ -24,62 +25,69 @@ export function NavLinks() {
     }
   };
 
+  const linkClass = (path: string) =>
+    `nav-link ${location.pathname === path ? "active" : ""}`;
+
   return (
-    <div className="navButtonContainer">
-      <a className="nav-button" onClick={() => navigate("/")}>
+    <nav className="header-nav">
+      <a className={linkClass("/")} onClick={() => navigate("/")}>
         Home
       </a>
       {user != null && (
-        <a className="nav-button" onClick={() => openPath("/discover")}>
+        <a className={linkClass("/discover")} onClick={() => openPath("/discover")}>
           Discover
         </a>
       )}
       {user != null && (
-        <a className="nav-button" onClick={() => openPath("/requests")}>
+        <a className={linkClass("/requests")} onClick={() => openPath("/requests")}>
           Requests
         </a>
       )}
       {user != null && (
-        <a className="nav-button" onClick={() => openPath("/profile")}>
+        <a className={linkClass("/profile")} onClick={() => openPath("/profile")}>
           Profile
         </a>
       )}
       {user == null && (
-        <a className="nav-button" onClick={() => navigate("/signup")}>
+        <a className={linkClass("/signup")} onClick={() => navigate("/signup")}>
           Signup
         </a>
       )}
       {user == null && (
-        <a className="nav-button" onClick={() => navigate("/login")}>
+        <a className={linkClass("/login")} onClick={() => navigate("/login")}>
           Login
         </a>
       )}
       {user != null && isAdmin && (
-        <a className="nav-button" onClick={() => openPath("/admin")}>
+        <a className={linkClass("/admin")} onClick={() => openPath("/admin")}>
           Admin
         </a>
       )}
       {user != null && (
-        <a className="nav-button" onClick={handleLogout}>
+        <a className="nav-link" onClick={handleLogout}>
           Logout
         </a>
       )}
       <button className="theme-toggle" onClick={toggle} aria-label="Toggle theme">
         {theme === "dark" ? "☀" : "☾"}
       </button>
-    </div>
+    </nav>
   );
 }
 
 export default function Header() {
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   return (
     <div className="header">
-      {user == null && <h1>Bandform</h1>}
-      {user != null && <h1>Welcome {user.name}</h1>}
-      <NavLinks />
-      <hr className="hr-solid" />
+      <a className="wordmark" onClick={() => navigate("/")}>
+        <span className="wordmark-note">♪</span>Bandform
+      </a>
+      <div className="header-right">
+        {user != null && <span className="header-greeting">Welcome, {user.name}</span>}
+        <NavLinks />
+      </div>
     </div>
   );
 }

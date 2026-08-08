@@ -20,11 +20,13 @@
   --shadow-lg: 6px 18px 46px rgba(0, 0, 0, 0.42);
   --shadow-inset-sm: inset 3px 3px 4px rgba(0, 0, 0, 0.36);
 
-  --font-sans: "Fira Sans", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
 
   // Stacking order for the windowed UI (see windows/WindowManagerContext).
   // Everything else in the app renders below this range.
   --z-window-base: 100;
   --z-window-focused: 200;
   --z-window-nav: 300;
+  --z-header: 400;
 }
