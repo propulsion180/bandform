@@ -26,6 +26,13 @@ public class NotificationService{
     return notificationRepository.findByUserIdAndReadFalse(userId);
   }
 
+  public void markAsRead(Long id){
+    notificationRepository.findById(id).ifPresent(n -> {
+      n.setRead(true);
+      notificationRepository.save(n);
+    });
+  }
+
   public Notification createNotification(User u, String sender, String message){
     Notification n = new Notification();
 

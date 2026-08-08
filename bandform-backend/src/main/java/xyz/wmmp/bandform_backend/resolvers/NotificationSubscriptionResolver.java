@@ -45,7 +45,8 @@ public class NotificationSubscriptionResolver{
 
     Flux<Notification> live = publisher.getStream(userId);
 
-    return Flux.concat(existing, live);
+    return Flux.concat(existing, live)
+            .doOnNext(n -> notificationService.markAsRead(n.getId()));
   }
 
 

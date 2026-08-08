@@ -64,6 +64,17 @@ public class JoinRequestService {
             throw new org.springframework.security.access.AccessDeniedException("You can only withdraw your own request or cancel your own band's invitation.");
         }
         joinRequestRepository.deleteById(id);
+
+        if (jr.isInvitedByBand()) {
+            Notification n = new Notification();
+            n.setUser(jr.getUser());
+            n.setMessage(jr.getBand().getName() + " withdrew its invitation to join as " + jr.getProposedRole() + ".");
+            n.setRead(false);
+            n.setSender(jr.getBand().getName());
+            notificationRepository.save(n);
+            notificationPublisher.publish(jr.getUser().getId(), n);
+        }
+
         return id;
         //find a better options rather than boolean.
     }
@@ -155,6 +166,18 @@ public class JoinRequestService {
         n.setSender(jr.getBand().getName());
         notificationRepository.save(n);
         notificationPublisher.publish(jr.getUser().getId(), n);
+
+        Band b = jr.getBand();
+        b.getMembers().stream().map(BandMember::getUser).forEach(member -> {
+            Notification mn = new Notification();
+            mn.setUser(member);
+            mn.setMessage(jr.getUser().getName() + "'s " + (jr.isInvitedByBand() ? "invitation" : "request") + " for " + b.getName() + " was " + (jr.isInvitedByBand() ? "declined" : "rejected") + ".");
+            mn.setRead(false);
+            mn.setSender(b.getName());
+            notificationRepository.save(mn);
+            notificationPublisher.publish(member.getId(), mn);
+        });
+
         return jRID;// notify hook for notifications
     }
 
@@ -174,6 +197,7 @@ public class JoinRequestService {
 
         //create bandmember and add to band
         Band b = jr.getBand();
+        List<User> existingMembers = b.getMembers().stream().map(BandMember::getUser).collect(Collectors.toList());
         BandMember bm = bandMemberService.createBandMember(b, jr.getUser(), new ArrayList<>(jr.getInterestedInstruments()), role);
 
         if (jr.getPosition() != null) {
@@ -188,6 +212,16 @@ public class JoinRequestService {
         n.setSender(jr.getBand().getName());
         notificationRepository.save(n);
         notificationPublisher.publish(jr.getUser().getId(), n);
+
+        existingMembers.forEach(member -> {
+            Notification mn = new Notification();
+            mn.setUser(member);
+            mn.setMessage(jr.getUser().getName() + " has joined " + b.getName() + " as " + bm.getRole() + ".");
+            mn.setRead(false);
+            mn.setSender(b.getName());
+            notificationRepository.save(mn);
+            notificationPublisher.publish(member.getId(), mn);
+        });
 
         return jRID;// notify hook for notifications
     }
