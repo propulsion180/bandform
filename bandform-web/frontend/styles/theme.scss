@@ -20,9 +20,6 @@
   --color-warning-muted: oklch(94% 0.050 80);
   --color-danger: oklch(50% 0.190 27);
   --color-danger-muted: oklch(93% 0.032 27);
-
-  --window-titlebar-bg: oklch(48% 0.112 51.7);
-  --window-titlebar-text: oklch(100% 0 0);
 }
 
 @mixin dark-theme {
@@ -43,9 +40,6 @@
   --color-warning-muted: oklch(28% 0.055 85);
   --color-danger: oklch(68% 0.204 28);
   --color-danger-muted: oklch(26% 0.080 28);
-
-  --window-titlebar-bg: oklch(32% 0.077 51.7);
-  --window-titlebar-text: oklch(94% 0.015 88);
 
   --shadow-inset-sm: inset 3px 3px 5px rgba(0, 0, 0, 0.6), inset -2px -2px 3px rgba(255, 255, 255, 0.06);
 }

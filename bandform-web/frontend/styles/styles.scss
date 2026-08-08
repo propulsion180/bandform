@@ -504,7 +504,7 @@ table.data-table th {
   flex-direction: column;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs);
   box-shadow: var(--shadow-md);
   transition: box-shadow 0.15s ease;
   overflow: hidden;
@@ -519,15 +519,30 @@ table.data-table th {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--window-titlebar-bg);
-  color: var(--window-titlebar-text);
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
   cursor: move;
   flex-shrink: 0;
   user-select: none;
 }
 
+// Focus is signalled the same way as the header's active nav-link: accent
+// title + a 2px accent line. The line is an inset shadow rather than a
+// thicker border so focusing never shifts the body content down a pixel.
+.window-frame--focused .window-titlebar {
+  color: var(--color-text);
+  box-shadow: inset 0 -2px 0 0 var(--color-accent);
+}
+
+.window-frame--focused .window-title {
+  color: var(--color-accent);
+}
+
 .window-title {
+  font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.9rem;
   white-space: nowrap;
@@ -544,9 +559,9 @@ table.data-table th {
 .window-minimize-btn,
 .window-close-btn {
   background: none;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-sm);
-  color: inherit;
+  border: none;
+  border-radius: var(--radius-xs);
+  color: var(--color-text-muted);
   width: 22px;
   height: 22px;
   line-height: 1;
@@ -554,9 +569,13 @@ table.data-table th {
   flex-shrink: 0;
 }
 
+.window-minimize-btn:hover {
+  color: var(--color-text);
+}
+
 .window-close-btn:hover {
-  background-color: var(--color-danger);
-  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background-color: var(--color-danger-muted);
 }
 
 .window-body {
@@ -571,10 +590,10 @@ table.data-table th {
   position: fixed;
   left: var(--space-3);
   bottom: var(--space-3);
-  background-color: var(--window-titlebar-bg);
-  color: var(--window-titlebar-text);
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-xs);
   padding: var(--space-2) var(--space-4);
   font-size: 0.9rem;
   font-weight: 600;
