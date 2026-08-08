@@ -17,7 +17,7 @@ html {
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--color-accent-2);
 }
 
 button {
@@ -126,7 +126,7 @@ h3 {
 .nav-button {
   background-color: var(--color-surface-alt);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   text-align: center;
   flex-grow: 1;
   padding: var(--space-2) var(--space-3);
@@ -155,7 +155,7 @@ h3 {
   color: var(--color-accent-contrast);
   background-color: var(--color-accent);
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   text-align: center;
   padding: var(--space-2) var(--space-3);
   cursor: pointer;
@@ -208,7 +208,7 @@ h3 {
   gap: var(--space-2);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs);
   box-shadow: var(--shadow-md);
 }
 
@@ -232,7 +232,7 @@ textarea.form-input {
   background-color: var(--color-surface);
   padding: var(--space-2);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   color: var(--color-text);
   font-size: 1rem;
   box-shadow: var(--shadow-inset-sm);
@@ -263,7 +263,7 @@ textarea.form-input {
 .card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs);
   padding: var(--space-3);
   box-shadow: var(--shadow-md);
 }
@@ -303,7 +303,7 @@ form.card {
 .chip {
   background-color: var(--color-surface-alt);
   border: 1px solid var(--color-border);
-  border-radius: 999px;
+  border-radius: var(--radius-xs);
   padding: 2px var(--space-2);
   font-size: 0.8rem;
   color: var(--color-text-muted);
@@ -311,15 +311,15 @@ form.card {
 
 .badge {
   display: inline-block;
-  border-radius: 999px;
+  border-radius: var(--radius-xs);
   padding: 2px var(--space-2);
   font-size: 0.75rem;
   font-weight: 600;
 }
 
 .badge-accent {
-  background-color: var(--color-accent-muted);
-  color: var(--color-accent);
+  background-color: var(--color-accent-2-muted);
+  color: var(--color-accent-2);
 }
 
 .badge-success {
@@ -370,7 +370,7 @@ table.data-table {
   margin: var(--space-2) 0;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   overflow: hidden;
   box-shadow: var(--shadow-md);
 }
@@ -407,7 +407,7 @@ table.data-table th {
   flex-direction: column;
   height: 400px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs);
   background-color: var(--color-surface);
   box-shadow: var(--shadow-md);
 }
@@ -426,14 +426,14 @@ table.data-table th {
   max-width: 70%;
   background-color: var(--color-surface-alt);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs);
   padding: var(--space-2) var(--space-3);
 }
 
 .chat-bubble.own {
   align-self: flex-end;
-  background-color: var(--color-accent-muted);
-  border-color: var(--color-accent);
+  background-color: var(--color-accent-2-muted);
+  border-color: var(--color-accent-2);
 }
 
 .chat-sender {
@@ -469,7 +469,7 @@ table.data-table th {
 .toast {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs);
   box-shadow: var(--shadow-lg);
   padding: var(--space-2) var(--space-3);
   font-size: 0.9rem;
@@ -479,7 +479,7 @@ table.data-table th {
 .theme-toggle {
   background: none;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   padding: var(--space-1) var(--space-2);
   cursor: pointer;
   color: var(--color-text);
