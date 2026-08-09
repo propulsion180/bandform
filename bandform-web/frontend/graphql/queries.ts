@@ -101,6 +101,7 @@ export const GET_ADMIN_USERS = graphql(`
       role
       city
       country
+      locked
     }
   }
 `);

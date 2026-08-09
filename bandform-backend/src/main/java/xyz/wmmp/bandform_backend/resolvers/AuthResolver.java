@@ -13,12 +13,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import xyz.wmmp.bandform_backend.authsec.CustomUserDetailsService;
 import xyz.wmmp.bandform_backend.authsec.JwtUtil;
 import xyz.wmmp.bandform_backend.authsec.PasswordPolicy;
 import xyz.wmmp.bandform_backend.data.LoginResult;
@@ -36,7 +34,6 @@ import java.util.UUID;
 @Controller
 public class AuthResolver {
 
-    @Autowired private CustomUserDetailsService userDetailsService;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtUtil jwtUtil;
     @Autowired private UserRepository userRepository;
@@ -61,15 +58,33 @@ public class AuthResolver {
         return null;
     }
 
+    // After this many consecutive failed attempts the account is locked and
+    // must be unlocked by an admin (see UserResolver.unlockUser).
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+
     @MutationMapping
     public LoginResult login(@Argument String name, @Argument String password){
-        UserDetails userDetails = userDetailsService.loadUserByUsername(name);
+        // Treat "user not found", "wrong password", and "locked" identically so a
+        // caller can't distinguish them and enumerate accounts or probe lock state.
+        User user = userRepository.findByName(name)
+                .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
-        if(!passwordEncoder.matches(password, userDetails.getPassword())){ //check password
-            throw new BadCredentialsException("Invalid credentials");
+        if(user.isLocked()){
+            throw new BadCredentialsException("Invalid username or password");
         }
 
-        User user = userRepository.findByName(name).orElseThrow();
+        if(!passwordEncoder.matches(password, user.getPasswordHash())){ //check password
+            int attempts = user.getFailedLoginAttempts() + 1;
+            user.setFailedLoginAttempts(attempts);
+            if(attempts >= MAX_FAILED_ATTEMPTS){
+                user.setLocked(true);
+            }
+            userRepository.save(user);
+            throw new BadCredentialsException("Invalid username or password");
+        }
+
+        // Successful login: clear the failed-attempt counter.
+        user.setFailedLoginAttempts(0);
 
         String jti = UUID.randomUUID().toString();
         String token = jwtUtil.generateToken(jti, user.getId().toString(), user.getRole().toString());

@@ -23,3 +23,20 @@ export function isStrongPassword(password: string): boolean {
     /[0-9]/.test(password)
   );
 }
+
+// Maximum lengths, mirroring the server-side @Size caps on the JPA entities
+// (see data/User, data/Band, data/BandPosition, data/Message, data/JoinRequest).
+// Used as `maxLength` on inputs; the backend remains the authoritative check.
+export const FIELD_MAX = {
+  name: 50,
+  email: 254,
+  city: 100,
+  country: 100,
+  userDescription: 500,
+  bandName: 100,
+  bandDescription: 1000,
+  positionDescription: 500,
+  message: 1000,
+  role: 100,
+  chatBody: 2000,
+} as const;

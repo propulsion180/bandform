@@ -4,6 +4,7 @@ import { useMutation } from "@apollo/client/react";
 import { CREATE_BAND, CREATE_BAND_MEMBER, CREATE_RANDOMIZED_BAND } from "../graphql/mutations";
 import { useAuth } from "../auth/AuthContext";
 import TagInput from "../components/TagInput";
+import { FIELD_MAX } from "../constants/validation";
 import { useOpenBandWindow, useWindowManager } from "../windows/WindowManagerContext";
 
 export default function BandCreator() {
@@ -122,7 +123,13 @@ export default function BandCreator() {
       <form onSubmit={mode === "manual" ? handleManualSubmit : handleAutoSubmit}>
         <div>
           <label>Band name</label>
-          <input className="form-input" value={name} onChange={(e) => setName(e.target.value)} required />
+          <input
+            className="form-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={FIELD_MAX.bandName}
+            required
+          />
         </div>
         <div>
           <label>Description</label>
@@ -130,16 +137,29 @@ export default function BandCreator() {
             className="form-input"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            maxLength={FIELD_MAX.bandDescription}
             required
           />
         </div>
         <div>
           <label>City</label>
-          <input className="form-input" value={city} onChange={(e) => setCity(e.target.value)} required />
+          <input
+            className="form-input"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            maxLength={FIELD_MAX.city}
+            required
+          />
         </div>
         <div>
           <label>Country</label>
-          <input className="form-input" value={country} onChange={(e) => setCountry(e.target.value)} required />
+          <input
+            className="form-input"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            maxLength={FIELD_MAX.country}
+            required
+          />
         </div>
         <TagInput label="Genres" values={genres} onChange={setGenres} placeholder="Type a genre, press Enter" />
 
@@ -154,7 +174,12 @@ export default function BandCreator() {
         </div>
         <div>
           <label>Your role (optional)</label>
-          <input className="form-input" value={yourRole} onChange={(e) => setYourRole(e.target.value)} />
+          <input
+            className="form-input"
+            value={yourRole}
+            onChange={(e) => setYourRole(e.target.value)}
+            maxLength={FIELD_MAX.role}
+          />
         </div>
 
         {mode === "manual" && (

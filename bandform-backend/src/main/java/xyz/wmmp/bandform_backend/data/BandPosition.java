@@ -1,6 +1,7 @@
 package xyz.wmmp.bandform_backend.data;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,8 @@ public class BandPosition {
     @JoinColumn(name = "instrument_id", nullable = false)
     private Instrument instrument;
 
+    @Size(max = 500)
+    @Column(length = 500)
     private String description;
 
     @Column(nullable = false)

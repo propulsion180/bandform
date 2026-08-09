@@ -82,4 +82,10 @@ public class UserResolver{
     public Long deleteUser(@Argument Long id){
          return userService.deleteUser(id);
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @MutationMapping
+    public boolean unlockUser(@Argument Long id){
+        return userService.unlockUser(id);
+    }
 }

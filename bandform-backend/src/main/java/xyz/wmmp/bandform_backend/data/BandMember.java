@@ -1,6 +1,7 @@
 package xyz.wmmp.bandform_backend.data;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,5 +41,6 @@ public class BandMember {
     @Column(nullable = false)
     private LocalDateTime joinedDate;
 
+    @Size(max = 100)
     private String role;
 }

@@ -43,6 +43,10 @@ type User{
     description: String!
     role: UserType!
     status: UserStatus!
+    # Whether the account is locked out (too many failed logins). Only resolved
+    # for the user themselves or a global admin/owner (see UserFieldResolver);
+    # null for everyone else.
+    locked: Boolean
     genres: [Genre]!
     instruments: [Instrument]!
     bandMemberships: [BandMember]!
@@ -157,6 +161,8 @@ type Mutation {
     ): ID
 
     deleteUser(id: ID!): ID
+
+    unlockUser(id: ID!): Boolean!
 
     createBand(
         name: String!

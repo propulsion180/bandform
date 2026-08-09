@@ -69,6 +69,15 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("user with this ID doesn't exist :(. This should only be triggered within nested calls."));
     }
 
+    public boolean unlockUser(Long id){
+        log.debug("Unlocking user with id: {}", id);
+        User u = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("A user with this ID doesn't exist :("));
+        u.setLocked(false);
+        u.setFailedLoginAttempts(0);
+        userRepository.save(u);
+        return true;
+    }
+
     public Long deleteUser(Long id){
         bandAuthorizationService.requireSelf(id);
         log.debug("Deleting user with id: {}", id);

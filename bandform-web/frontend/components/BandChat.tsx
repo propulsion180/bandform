@@ -5,6 +5,7 @@ import { ISSUE_WS_TICKET, SEND_MESSAGE } from "../graphql/mutations";
 import { BAND_MESSAGE_ADDED } from "../graphql/subscriptions";
 import { GetBandMessagesQuery } from "../gql/graphql";
 import { useAuth } from "../auth/AuthContext";
+import { FIELD_MAX } from "../constants/validation";
 
 type ChatMessage = GetBandMessagesQuery["bandMessages"][number];
 
@@ -76,6 +77,7 @@ export default function BandChat({ bandId }: { bandId: string }) {
           placeholder="Message the band..."
           value={body}
           onChange={(e) => setBody(e.target.value)}
+          maxLength={FIELD_MAX.chatBody}
         />
         <button type="submit" className="small-button" disabled={sending || !body.trim()}>
           Send

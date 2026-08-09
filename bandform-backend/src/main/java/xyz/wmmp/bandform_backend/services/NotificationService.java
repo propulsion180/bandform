@@ -1,24 +1,20 @@
 package xyz.wmmp.bandform_backend.services;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import xyz.wmmp.bandform_backend.repositories.NotificationRepository;
 import xyz.wmmp.bandform_backend.data.Notification;
-import xyz.wmmp.bandform_backend.data.User;
 
 @Service
 public class NotificationService{
   private final NotificationRepository notificationRepository;
-  private final UserService userService;
 
   @Autowired
-  public NotificationService(NotificationRepository notificationRepository, UserService userService){
+  public NotificationService(NotificationRepository notificationRepository){
     this.notificationRepository = notificationRepository;
-    this.userService = userService;
   }
 
 
@@ -32,33 +28,4 @@ public class NotificationService{
       notificationRepository.save(n);
     });
   }
-
-  public Notification createNotification(User u, String sender, String message){
-    Notification n = new Notification();
-
-    n.setUser(u);
-    n.setSender(sender);
-    n.setMessage(message);
-
-    n = notificationRepository.save(n);
-    List<Notification> toUpdate = u.getNotifications();
-    toUpdate.add(n);
-    userService.updateUser(u.getId(), null, null, null, null, null, null, null, null, null, null, toUpdate);
-    return n;
-  }
-
-  public Long deleteNotification(Long id){
-    Notification n = notificationRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No notification with this ID " + id));
-
-    List<Notification> toUpdate = n.getUser().getNotifications();
-    toUpdate.remove(n);
-
-    userService.updateUser(n.getUser().getId(), null, null, null, null, null, null, null, null, null, null, toUpdate);
-
-    notificationRepository.deleteById(id);
-
-    return id;
-  }
-  
-  
 }

@@ -26,6 +26,7 @@ type Documents = {
     "\n  mutation UpdateUser(\n    $id: ID!\n    $name: String\n    $email: String\n    $age: Int\n    $city: String\n    $country: String\n    $description: String\n    $status: UserStatus\n    $genres: [String!]\n    $instruments: [String!]\n  ) {\n    updateUser(\n      id: $id\n      name: $name\n      email: $email\n      age: $age\n      city: $city\n      country: $country\n      description: $description\n      status: $status\n      genres: $genres\n      instruments: $instruments\n    )\n  }\n": typeof types.UpdateUserDocument,
     "\n  mutation ChangePassword($newPassword: String!) {\n    changePassword(newPassword: $newPassword)\n  }\n": typeof types.ChangePasswordDocument,
     "\n  mutation DeleteUser($id: ID!) {\n    deleteUser(id: $id)\n  }\n": typeof types.DeleteUserDocument,
+    "\n  mutation UnlockUser($id: ID!) {\n    unlockUser(id: $id)\n  }\n": typeof types.UnlockUserDocument,
     "\n  mutation CreateBand(\n    $name: String!\n    $description: String!\n    $city: String!\n    $country: String!\n    $genres: [String!]!\n  ) {\n    createBand(\n      name: $name\n      description: $description\n      city: $city\n      country: $country\n      genres: $genres\n    ) {\n      id\n    }\n  }\n": typeof types.CreateBandDocument,
     "\n  mutation UpdateBand(\n    $id: ID!\n    $name: String\n    $description: String\n    $city: String\n    $country: String\n    $genres: [String!]\n  ) {\n    updateBand(\n      id: $id\n      name: $name\n      description: $description\n      city: $city\n      country: $country\n      genres: $genres\n    )\n  }\n": typeof types.UpdateBandDocument,
     "\n  mutation DeleteBand($id: ID!) {\n    deleteBand(id: $id)\n  }\n": typeof types.DeleteBandDocument,
@@ -50,7 +51,7 @@ type Documents = {
     "\n  query GetUserJoinRequests($uID: ID!) {\n    userJoinRequests(uID: $uID) {\n      ...BandJoinRequestFields\n      band {\n        id\n        name\n      }\n    }\n  }\n": typeof types.GetUserJoinRequestsDocument,
     "\n  query GetRecommendedUsers(\n    $bp: ID!\n    $withinCity: Boolean!\n    $withinCountry: Boolean!\n    $sameGenre: Boolean!\n    $singleInstrument: Boolean!\n    $locGenreWeight: Int!\n  ) {\n    recommendUser(\n      bp: $bp\n      withinCity: $withinCity\n      withinCountry: $withinCountry\n      sameGenre: $sameGenre\n      singleInstrument: $singleInstrument\n      locGenreWeight: $locGenreWeight\n    ) {\n      ...UserCardFields\n    }\n  }\n": typeof types.GetRecommendedUsersDocument,
     "\n  query GetBandMessages($bandId: ID!, $limit: Int, $before: ID) {\n    bandMessages(bandId: $bandId, limit: $limit, before: $before) {\n      ...MessageFields\n    }\n  }\n": typeof types.GetBandMessagesDocument,
-    "\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n    }\n  }\n": typeof types.GetAdminUsersDocument,
+    "\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n      locked\n    }\n  }\n": typeof types.GetAdminUsersDocument,
     "\n  query GetAdminBands {\n    bands {\n      id\n      name\n      city\n      country\n    }\n  }\n": typeof types.GetAdminBandsDocument,
     "\n  subscription BandMessageAdded($bandId: ID!, $ticket: String!) {\n    messageAdded(bandId: $bandId, ticket: $ticket) {\n      ...MessageFields\n    }\n  }\n": typeof types.BandMessageAddedDocument,
     "\n  subscription Notifications($ticket: String!) {\n    notifications(ticket: $ticket) {\n      id\n      message\n      sender\n    }\n  }\n": typeof types.NotificationsDocument,
@@ -68,6 +69,7 @@ const documents: Documents = {
     "\n  mutation UpdateUser(\n    $id: ID!\n    $name: String\n    $email: String\n    $age: Int\n    $city: String\n    $country: String\n    $description: String\n    $status: UserStatus\n    $genres: [String!]\n    $instruments: [String!]\n  ) {\n    updateUser(\n      id: $id\n      name: $name\n      email: $email\n      age: $age\n      city: $city\n      country: $country\n      description: $description\n      status: $status\n      genres: $genres\n      instruments: $instruments\n    )\n  }\n": types.UpdateUserDocument,
     "\n  mutation ChangePassword($newPassword: String!) {\n    changePassword(newPassword: $newPassword)\n  }\n": types.ChangePasswordDocument,
     "\n  mutation DeleteUser($id: ID!) {\n    deleteUser(id: $id)\n  }\n": types.DeleteUserDocument,
+    "\n  mutation UnlockUser($id: ID!) {\n    unlockUser(id: $id)\n  }\n": types.UnlockUserDocument,
     "\n  mutation CreateBand(\n    $name: String!\n    $description: String!\n    $city: String!\n    $country: String!\n    $genres: [String!]!\n  ) {\n    createBand(\n      name: $name\n      description: $description\n      city: $city\n      country: $country\n      genres: $genres\n    ) {\n      id\n    }\n  }\n": types.CreateBandDocument,
     "\n  mutation UpdateBand(\n    $id: ID!\n    $name: String\n    $description: String\n    $city: String\n    $country: String\n    $genres: [String!]\n  ) {\n    updateBand(\n      id: $id\n      name: $name\n      description: $description\n      city: $city\n      country: $country\n      genres: $genres\n    )\n  }\n": types.UpdateBandDocument,
     "\n  mutation DeleteBand($id: ID!) {\n    deleteBand(id: $id)\n  }\n": types.DeleteBandDocument,
@@ -92,7 +94,7 @@ const documents: Documents = {
     "\n  query GetUserJoinRequests($uID: ID!) {\n    userJoinRequests(uID: $uID) {\n      ...BandJoinRequestFields\n      band {\n        id\n        name\n      }\n    }\n  }\n": types.GetUserJoinRequestsDocument,
     "\n  query GetRecommendedUsers(\n    $bp: ID!\n    $withinCity: Boolean!\n    $withinCountry: Boolean!\n    $sameGenre: Boolean!\n    $singleInstrument: Boolean!\n    $locGenreWeight: Int!\n  ) {\n    recommendUser(\n      bp: $bp\n      withinCity: $withinCity\n      withinCountry: $withinCountry\n      sameGenre: $sameGenre\n      singleInstrument: $singleInstrument\n      locGenreWeight: $locGenreWeight\n    ) {\n      ...UserCardFields\n    }\n  }\n": types.GetRecommendedUsersDocument,
     "\n  query GetBandMessages($bandId: ID!, $limit: Int, $before: ID) {\n    bandMessages(bandId: $bandId, limit: $limit, before: $before) {\n      ...MessageFields\n    }\n  }\n": types.GetBandMessagesDocument,
-    "\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n    }\n  }\n": types.GetAdminUsersDocument,
+    "\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n      locked\n    }\n  }\n": types.GetAdminUsersDocument,
     "\n  query GetAdminBands {\n    bands {\n      id\n      name\n      city\n      country\n    }\n  }\n": types.GetAdminBandsDocument,
     "\n  subscription BandMessageAdded($bandId: ID!, $ticket: String!) {\n    messageAdded(bandId: $bandId, ticket: $ticket) {\n      ...MessageFields\n    }\n  }\n": types.BandMessageAddedDocument,
     "\n  subscription Notifications($ticket: String!) {\n    notifications(ticket: $ticket) {\n      id\n      message\n      sender\n    }\n  }\n": types.NotificationsDocument,
@@ -160,6 +162,10 @@ export function graphql(source: "\n  mutation ChangePassword($newPassword: Strin
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation DeleteUser($id: ID!) {\n    deleteUser(id: $id)\n  }\n"): (typeof documents)["\n  mutation DeleteUser($id: ID!) {\n    deleteUser(id: $id)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UnlockUser($id: ID!) {\n    unlockUser(id: $id)\n  }\n"): (typeof documents)["\n  mutation UnlockUser($id: ID!) {\n    unlockUser(id: $id)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -259,7 +265,7 @@ export function graphql(source: "\n  query GetBandMessages($bandId: ID!, $limit:
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n    }\n  }\n"): (typeof documents)["\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n    }\n  }\n"];
+export function graphql(source: "\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n      locked\n    }\n  }\n"): (typeof documents)["\n  query GetAdminUsers {\n    users {\n      id\n      name\n      email\n      role\n      city\n      country\n      locked\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

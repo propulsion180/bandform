@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,9 +27,11 @@ public class User {
 
         @NotEmpty
         @NotNull
+        @Size(max = 50)
         @Column(nullable = false)
         private String name;
 
+        @Size(max = 254)
         @Column(nullable = false)
         private String email;
 
@@ -48,12 +51,16 @@ public class User {
 
         @NotEmpty
         @NotBlank
+        @Size(max = 100)
         private String city;
 
         @NotEmpty
         @NotBlank
+        @Size(max = 100)
         private String country;
 
+        @Size(max = 500)
+        @Column(length = 500)
         private String description;
 
         @NotNull
@@ -62,6 +69,10 @@ public class User {
         private UserType role;
 
         private boolean locked = false;
+
+        @JsonIgnore
+        @Column(nullable = false)
+        private int failedLoginAttempts = 0;
 
         @Enumerated(EnumType.STRING)
         @Column(nullable = false)

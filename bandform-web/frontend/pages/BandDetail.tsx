@@ -14,6 +14,7 @@ import { useAuth } from "../auth/AuthContext";
 import { useOpenPath } from "../windows/useOpenPath";
 import { useWindowManager } from "../windows/WindowManagerContext";
 import BandChat from "../components/BandChat";
+import { FIELD_MAX } from "../constants/validation";
 
 const statusBadgeClass: Record<string, string> = {
   PENDING: "badge-warning",
@@ -243,6 +244,7 @@ export default function BandDetail({ bandId: id }: { bandId: string }) {
                       placeholder="Message to the band (optional)"
                       value={joinMessage}
                       onChange={(e) => setJoinMessage(e.target.value)}
+                      maxLength={FIELD_MAX.message}
                     />
                     <div className="navButtonContainer">
                       <a
@@ -304,6 +306,7 @@ export default function BandDetail({ bandId: id }: { bandId: string }) {
                             placeholder="Role you're offering"
                             value={inviteRole}
                             onChange={(e) => setInviteRole(e.target.value)}
+                            maxLength={FIELD_MAX.role}
                           />
                           <a className="small-button" onClick={() => handleInvite(position!.id, candidate.id)}>
                             {inviting ? "Sending..." : "Send invitation"}
@@ -342,6 +345,7 @@ export default function BandDetail({ bandId: id }: { bandId: string }) {
               placeholder="Description"
               value={newPositionDescription}
               onChange={(e) => setNewPositionDescription(e.target.value)}
+              maxLength={FIELD_MAX.positionDescription}
             />
             <button type="submit" className="small-button">
               Add position
@@ -383,6 +387,7 @@ export default function BandDetail({ bandId: id }: { bandId: string }) {
                           placeholder="Role in the band"
                           value={bandRole}
                           onChange={(e) => setBandRole(e.target.value)}
+                          maxLength={FIELD_MAX.role}
                         />
                         <a className="small-button" onClick={() => handleAccept(requestId)}>
                           Confirm

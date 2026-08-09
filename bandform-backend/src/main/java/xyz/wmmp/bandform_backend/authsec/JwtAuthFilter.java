@@ -45,7 +45,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 Claims claims = jwtUtil.validate(token);
                 if (isSessionActive(claims)) {
                     String role = claims.get("role", String.class);
-                    GrantedAuthority authority = new SimpleGrantedAuthority(role);
+                    // Spring's hasRole/hasAnyRole match authorities prefixed with
+                    // "ROLE_", so the granted authority must carry that prefix for
+                    // the @PreAuthorize("hasAnyRole('ADMIN','OWNER')") checks to fire.
+                    GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
                     SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(claims.getSubject(), null,List.of(authority)));
                 }
             }catch (JwtException e){

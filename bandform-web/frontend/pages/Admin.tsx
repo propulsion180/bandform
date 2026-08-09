@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { GET_ADMIN_BANDS, GET_ADMIN_USERS } from "../graphql/queries";
-import { DELETE_BAND, DELETE_USER } from "../graphql/mutations";
+import { DELETE_BAND, DELETE_USER, UNLOCK_USER } from "../graphql/mutations";
 
 export default function Admin() {
   const [tab, setTab] = useState<"users" | "bands">("users");
@@ -14,6 +14,7 @@ export default function Admin() {
     useLazyQuery(GET_ADMIN_BANDS);
 
   const [deleteUser] = useMutation(DELETE_USER);
+  const [unlockUser] = useMutation(UNLOCK_USER);
   const [deleteBand] = useMutation(DELETE_BAND);
 
   const selectTab = (next: "users" | "bands") => {
@@ -61,6 +62,7 @@ export default function Admin() {
                 <th>Email</th>
                 <th>Role</th>
                 <th>Location</th>
+                <th>Status</th>
                 <th></th>
               </tr>
             </thead>
@@ -74,6 +76,20 @@ export default function Admin() {
                     {u.city}, {u.country}
                   </td>
                   <td>
+                    {u.locked ? <span className="badge badge-danger">Locked</span> : "Active"}
+                  </td>
+                  <td>
+                    {u.locked && (
+                      <a
+                        className="small-button secondary"
+                        onClick={async () => {
+                          await unlockUser({ variables: { id: u.id } });
+                          refetchUsers();
+                        }}
+                      >
+                        Unlock
+                      </a>
+                    )}
                     <a
                       className="small-button danger"
                       onClick={async () => {

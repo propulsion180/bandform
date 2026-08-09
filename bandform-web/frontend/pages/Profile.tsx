@@ -5,7 +5,7 @@ import { useAuth } from "../auth/AuthContext";
 import TagInput from "../components/TagInput";
 import { useNavigate } from "react-router-dom";
 import { NOT_IN_BAND_STATUS_OPTIONS, IN_BAND_STATUS_OPTIONS } from "../constants/userStatus";
-import { isStrongPassword, isValidEmail, PASSWORD_RULE } from "../constants/validation";
+import { isStrongPassword, isValidEmail, PASSWORD_RULE, FIELD_MAX } from "../constants/validation";
 import { UserStatus } from "../gql/graphql";
 
 export default function Profile() {
@@ -77,7 +77,13 @@ export default function Profile() {
       <form onSubmit={handleSave}>
         <div>
           <label>Name</label>
-          <input className="form-input" value={name} onChange={(e) => setName(e.target.value)} required />
+          <input
+            className="form-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={FIELD_MAX.name}
+            required
+          />
         </div>
         <div>
           <label>Email</label>
@@ -86,16 +92,29 @@ export default function Profile() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            maxLength={FIELD_MAX.email}
             required
           />
         </div>
         <div>
           <label>City</label>
-          <input className="form-input" value={city} onChange={(e) => setCity(e.target.value)} required />
+          <input
+            className="form-input"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            maxLength={FIELD_MAX.city}
+            required
+          />
         </div>
         <div>
           <label>Country</label>
-          <input className="form-input" value={country} onChange={(e) => setCountry(e.target.value)} required />
+          <input
+            className="form-input"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            maxLength={FIELD_MAX.country}
+            required
+          />
         </div>
         <div>
           <label>Description</label>
@@ -103,6 +122,7 @@ export default function Profile() {
             className="form-input"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            maxLength={FIELD_MAX.userDescription}
           />
         </div>
         <div>

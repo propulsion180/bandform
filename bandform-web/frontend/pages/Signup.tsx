@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { SIGNUP } from "../graphql/mutations";
 import TagInput from "../components/TagInput";
 import { NOT_IN_BAND_STATUS_OPTIONS } from "../constants/userStatus";
-import { isStrongPassword, isValidEmail, PASSWORD_RULE } from "../constants/validation";
+import { isStrongPassword, isValidEmail, PASSWORD_RULE, FIELD_MAX } from "../constants/validation";
 import { UserStatus } from "../gql/graphql";
 
 export default function Signup() {
@@ -77,6 +77,7 @@ export default function Signup() {
             id="username"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            maxLength={FIELD_MAX.name}
             required
           />
         </div>
@@ -113,6 +114,7 @@ export default function Signup() {
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            maxLength={FIELD_MAX.email}
             required
           />
         </div>
@@ -137,6 +139,7 @@ export default function Signup() {
             id="city"
             value={city}
             onChange={(e) => setCity(e.target.value)}
+            maxLength={FIELD_MAX.city}
             required
           />
         </div>
@@ -148,6 +151,7 @@ export default function Signup() {
             id="country"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
+            maxLength={FIELD_MAX.country}
             required
           />
         </div>
@@ -159,6 +163,7 @@ export default function Signup() {
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            maxLength={FIELD_MAX.userDescription}
             required
           />
         </div>

@@ -87,6 +87,12 @@ export const DELETE_USER = graphql(`
   }
 `);
 
+export const UNLOCK_USER = graphql(`
+  mutation UnlockUser($id: ID!) {
+    unlockUser(id: $id)
+  }
+`);
+
 export const CREATE_BAND = graphql(`
   mutation CreateBand(
     $name: String!

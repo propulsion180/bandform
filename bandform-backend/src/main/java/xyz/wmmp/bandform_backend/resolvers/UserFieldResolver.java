@@ -48,4 +48,31 @@ public class UserFieldResolver {
         }
         return null;
     }
+
+    // Lock status is likewise only meaningful to the account owner or an admin
+    // (who needs it to unlock). Everyone else -- and anonymous/WS-context reads
+    // with no SecurityContext -- gets null.
+    @SchemaMapping(typeName = "User", field = "locked")
+    public Boolean locked(Object source) {
+        Long targetId;
+        boolean locked;
+        if (source instanceof UserProfile up) {
+            targetId = up.id();
+            locked = up.locked();
+        } else if (source instanceof User u) {
+            targetId = u.getId();
+            locked = u.isLocked();
+        } else {
+            return null;
+        }
+
+        Long currentId = bandAuthorizationService.currentUserIdOrNull();
+        if (currentId == null) {
+            return null;
+        }
+        if (currentId.equals(targetId) || bandAuthorizationService.isGlobalAdmin(currentId)) {
+            return locked;
+        }
+        return null;
+    }
 }
