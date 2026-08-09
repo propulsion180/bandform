@@ -31,7 +31,7 @@ export type UserCardFieldsFragment = { id: string, name: string, city: string, c
 
 export type MessageFieldsFragment = { id: string, body: string, sentAt: string, sender: { id: string, name: string } };
 
-export type MeFieldsFragment = { id: string, name: string, email: string, age: number, city: string, country: string, description: string, role: UserType, status: UserStatus, genres: Array<{ name: string | null } | null>, instruments: Array<{ name: string | null } | null>, bandMemberships: Array<{ id: string, role: string | null, joinedDate: string, band: { id: string, name: string, owner: { id: string } | null } } | null> };
+export type MeFieldsFragment = { id: string, name: string, email: string | null, age: number, city: string, country: string, description: string, role: UserType, status: UserStatus, genres: Array<{ name: string | null } | null>, instruments: Array<{ name: string | null } | null>, bandMemberships: Array<{ id: string, role: string | null, joinedDate: string, band: { id: string, name: string, owner: { id: string } | null } } | null> };
 
 export type LoginMutationVariables = Exact<{
   name: string;
@@ -39,7 +39,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { user: { id: string, name: string, email: string, age: number, city: string, country: string, description: string, role: UserType, status: UserStatus, genres: Array<{ name: string | null } | null>, instruments: Array<{ name: string | null } | null>, bandMemberships: Array<{ id: string, role: string | null, joinedDate: string, band: { id: string, name: string, owner: { id: string } | null } } | null> } } };
+export type LoginMutation = { login: { user: { id: string, name: string, email: string | null, age: number, city: string, country: string, description: string, role: UserType, status: UserStatus, genres: Array<{ name: string | null } | null>, instruments: Array<{ name: string | null } | null>, bandMemberships: Array<{ id: string, role: string | null, joinedDate: string, band: { id: string, name: string, owner: { id: string } | null } } | null> } } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -243,7 +243,7 @@ export type CreateRandomizedBandMutation = { randomizedBandCreator: { id: string
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { me: { id: string, name: string, email: string, age: number, city: string, country: string, description: string, role: UserType, status: UserStatus, genres: Array<{ name: string | null } | null>, instruments: Array<{ name: string | null } | null>, bandMemberships: Array<{ id: string, role: string | null, joinedDate: string, band: { id: string, name: string, owner: { id: string } | null } } | null> } | null };
+export type GetMeQuery = { me: { id: string, name: string, email: string | null, age: number, city: string, country: string, description: string, role: UserType, status: UserStatus, genres: Array<{ name: string | null } | null>, instruments: Array<{ name: string | null } | null>, bandMemberships: Array<{ id: string, role: string | null, joinedDate: string, band: { id: string, name: string, owner: { id: string } | null } } | null> } | null };
 
 export type GetBandsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -305,7 +305,7 @@ export type GetBandMessagesQuery = { bandMessages: Array<{ id: string, body: str
 export type GetAdminUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAdminUsersQuery = { users: Array<{ id: string, name: string, email: string, role: UserType, city: string, country: string }> };
+export type GetAdminUsersQuery = { users: Array<{ id: string, name: string, email: string | null, role: UserType, city: string, country: string }> };
 
 export type GetAdminBandsQueryVariables = Exact<{ [key: string]: never; }>;
 

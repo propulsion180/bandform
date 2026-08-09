@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { SIGNUP } from "../graphql/mutations";
 import TagInput from "../components/TagInput";
 import { NOT_IN_BAND_STATUS_OPTIONS } from "../constants/userStatus";
+import { isStrongPassword, isValidEmail, PASSWORD_RULE } from "../constants/validation";
 import { UserStatus } from "../gql/graphql";
 
 export default function Signup() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [plainPassword, setPlainPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
   const [age, setAge] = useState<number>(18);
   const [city, setCity] = useState<string>("");
@@ -24,6 +26,19 @@ export default function Signup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
+
+    if (!isValidEmail(email)) {
+      setErr("Please enter a valid email address.");
+      return;
+    }
+    if (!isStrongPassword(plainPassword)) {
+      setErr(PASSWORD_RULE);
+      return;
+    }
+    if (plainPassword !== confirmPassword) {
+      setErr("Passwords do not match.");
+      return;
+    }
 
     try {
       const response = await createUser({
@@ -73,6 +88,19 @@ export default function Signup() {
             id="password"
             value={plainPassword}
             onChange={(e) => setPlainPassword(e.target.value)}
+            minLength={8}
+            required
+          />
+          <p className="field-hint">{PASSWORD_RULE}</p>
+        </div>
+        <div>
+          <label htmlFor="confirmPassword">Confirm password</label>
+          <input
+            className="form-input"
+            type="password"
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             minLength={8}
             required
           />

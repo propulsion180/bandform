@@ -10,7 +10,7 @@ export default function Login() {
   const [err, setErr] = useState("");
   const navigate = useNavigate();
   const location = useLocation() as { state?: { email?: string } };
-  const { setUser } = useAuth();
+  const { refreshUser } = useAuth();
 
   const [login, { loading }] = useMutation(LOGIN);
 
@@ -20,7 +20,7 @@ export default function Login() {
     try {
       const result = await login({ variables: { name, password } });
       if (result.data?.login.user) {
-        setUser(result.data.login.user);
+        await refreshUser();
         navigate("/");
       }
     } catch (error) {

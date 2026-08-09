@@ -5,6 +5,7 @@ import { useAuth } from "../auth/AuthContext";
 import TagInput from "../components/TagInput";
 import { useNavigate } from "react-router-dom";
 import { NOT_IN_BAND_STATUS_OPTIONS, IN_BAND_STATUS_OPTIONS } from "../constants/userStatus";
+import { isStrongPassword, isValidEmail, PASSWORD_RULE } from "../constants/validation";
 import { UserStatus } from "../gql/graphql";
 
 export default function Profile() {
@@ -21,6 +22,8 @@ export default function Profile() {
     (user?.instruments.map((i) => i?.name).filter(Boolean) as string[]) ?? []
   );
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordErr, setPasswordErr] = useState("");
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
 
@@ -33,6 +36,10 @@ export default function Profile() {
     e.preventDefault();
     setErr("");
     setSaved(false);
+    if (!isValidEmail(email)) {
+      setErr("Please enter a valid email address.");
+      return;
+    }
     try {
       await updateUser({
         variables: { id: user.id, name, email, city, country, description, status, genres, instruments },
@@ -46,7 +53,15 @@ export default function Profile() {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPassword.trim()) return;
+    setPasswordErr("");
+    if (!isStrongPassword(newPassword)) {
+      setPasswordErr(PASSWORD_RULE);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordErr("Passwords do not match.");
+      return;
+    }
     await changePassword({ variables: { newPassword } });
     setUser(null);
     navigate("/login");
@@ -139,7 +154,19 @@ export default function Profile() {
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
+          <p className="field-hint">{PASSWORD_RULE}</p>
         </div>
+        <div>
+          <label>Confirm new password</label>
+          <input
+            className="form-input"
+            type="password"
+            minLength={8}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
+        {passwordErr && <p className="error-text">{passwordErr}</p>}
         <button type="submit" className="small-button secondary" disabled={changingPassword}>
           {changingPassword ? "Updating..." : "Change password"}
         </button>

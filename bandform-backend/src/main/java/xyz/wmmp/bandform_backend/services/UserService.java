@@ -5,14 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import xyz.wmmp.bandform_backend.authsec.PasswordPolicy;
 import xyz.wmmp.bandform_backend.data.*;
 import xyz.wmmp.bandform_backend.repositories.GenreRepository;
 import xyz.wmmp.bandform_backend.repositories.InstrumentRepository;
@@ -35,12 +34,14 @@ public class UserService {
     private final InstrumentService instrumentService;
     private final BandMemberService bandMemberService;
     private final PasswordEncoder passwordEncoder;
+    private final BandAuthorizationService bandAuthorizationService;
+    private final PasswordPolicy passwordPolicy;
 
     String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     Pattern p = Pattern.compile(emailRegex);
 
     @Autowired
-    public UserService(UserRepository userRepository, GenreRepository genreRepository, InstrumentRepository instrumentRepository, GenreService genreService, InstrumentService instrumentService, BandMemberService bandMemberService, PasswordEncoder passwordEncoder){
+    public UserService(UserRepository userRepository, GenreRepository genreRepository, InstrumentRepository instrumentRepository, GenreService genreService, InstrumentService instrumentService, BandMemberService bandMemberService, PasswordEncoder passwordEncoder, BandAuthorizationService bandAuthorizationService, PasswordPolicy passwordPolicy){
         this.userRepository = userRepository;
         this.genreRepository = genreRepository;
         this.instrumentRepository = instrumentRepository;
@@ -48,6 +49,8 @@ public class UserService {
         this.instrumentService = instrumentService;
         this.bandMemberService = bandMemberService;
         this.passwordEncoder = passwordEncoder;
+        this.bandAuthorizationService = bandAuthorizationService;
+        this.passwordPolicy = passwordPolicy;
     }
 
     public List<UserProfile> getAllUsers(){
@@ -67,6 +70,7 @@ public class UserService {
     }
 
     public Long deleteUser(Long id){
+        bandAuthorizationService.requireSelf(id);
         log.debug("Deleting user with id: {}", id);
         userRepository.deleteById(id);
         log.debug("Deleted!!");
@@ -80,7 +84,7 @@ public class UserService {
         u.setName(name);
         if(!p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
         u.setEmail(email);
-        if(plainPassword.length() < 8){ throw new IllegalArgumentException("Password needs to be larger than 8 characters"); }
+        passwordPolicy.validate(plainPassword);
         u.setPasswordHash(passwordEncoder.encode(plainPassword));
         if(age < 16 || age > 120){ throw new IllegalArgumentException("Must be 16 or older to use this service");}
         u.setAge(age);
@@ -102,8 +106,7 @@ public class UserService {
     public Long updateUser(Long uid, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships, List<Notification> notifications){
 
        Long upid = Long.parseLong((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-       if(upid == null){throw new InsufficientAuthenticationException("Only logged in people can update users");}
-       if(upid != uid){           
+       if(!upid.equals(uid)){
            User updater = userRepository.findById(upid).orElseThrow(() -> new IllegalArgumentException());
            if(updater.getRole() == UserType.NORMAL){throw new AccessDeniedException("Unpriveledged access!!!! by: " + updater.getName() + " uid: " + upid);}
        }

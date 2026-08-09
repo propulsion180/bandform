@@ -4,6 +4,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -38,6 +39,7 @@ public class RecommenderResolver {
         this.bandPositionService = bandPositionService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<Band> recommendBand(
             @Argument Boolean withinCity,
@@ -111,6 +113,7 @@ public class RecommenderResolver {
         return bandsToScore.entrySet().stream().sorted(Map.Entry.<Band, Double>comparingByValue().reversed()).map(Map.Entry::getKey).toList();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @QueryMapping
     public List<UserProfile> recommendUser(
             @Argument Long bp,

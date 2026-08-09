@@ -37,7 +37,7 @@ import java.util.function.Supplier;
 public class DevDataSeeder implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DevDataSeeder.class);
-    private static final String PASSWORD = "password123";
+    private static final String PASSWORD = "Password123";
     private static final int DEFAULT_AGE = 27;
 
     private final UserService userService;

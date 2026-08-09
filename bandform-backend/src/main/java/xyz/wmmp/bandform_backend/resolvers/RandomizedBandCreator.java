@@ -3,6 +3,7 @@ package xyz.wmmp.bandform_backend.resolvers;
 import jakarta.persistence.ManyToMany;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import xyz.wmmp.bandform_backend.data.Band;
@@ -37,6 +38,7 @@ public class RandomizedBandCreator {
     }
 
 
+    @PreAuthorize("isAuthenticated() and (hasAnyRole('ADMIN', 'OWNER') or #yourUID.toString() == authentication.principal)")
     @MutationMapping
     public Band randomizedBandCreator(
             @Argument Long yourUID,

@@ -32,6 +32,28 @@ public class BandAuthorizationService {
         return Long.parseLong((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
 
+    /**
+     * The current numeric user id, or null when there is no authenticated user
+     * (e.g. an anonymous request, or a WebSocket-driven field resolution that
+     * runs with no SecurityContext). Lets read-time field guards deny cleanly
+     * instead of throwing NumberFormatException on the "anonymousUser" principal.
+     */
+    public Long currentUserIdOrNull() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof String s)) {
+            return null;
+        }
+        try {
+            return Long.parseLong(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     public boolean isGlobalAdmin(Long userId) {
         User caller = userRepository.findById(userId).orElseThrow();
         return caller.getRole() == UserType.ADMIN || caller.getRole() == UserType.OWNER;

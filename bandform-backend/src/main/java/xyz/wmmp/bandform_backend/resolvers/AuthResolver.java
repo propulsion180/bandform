@@ -20,6 +20,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import xyz.wmmp.bandform_backend.authsec.CustomUserDetailsService;
 import xyz.wmmp.bandform_backend.authsec.JwtUtil;
+import xyz.wmmp.bandform_backend.authsec.PasswordPolicy;
 import xyz.wmmp.bandform_backend.data.LoginResult;
 import xyz.wmmp.bandform_backend.data.User;
 import xyz.wmmp.bandform_backend.data.UserProfile;
@@ -41,6 +42,7 @@ public class AuthResolver {
     @Autowired private UserRepository userRepository;
     @Autowired private WsTicketService wsTicketService;
     @Autowired private BandAuthorizationService bandAuthorizationService;
+    @Autowired private PasswordPolicy passwordPolicy;
 
     @Value("${auth.cookie.secure:false}")
     private boolean secureCookie;
@@ -109,9 +111,10 @@ public class AuthResolver {
         return true;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping
     public boolean changePassword(@Argument String newPassword){
-        if(newPassword == null || newPassword.isBlank()){ return false; }
+        passwordPolicy.validate(newPassword);
         String token = sessionCookieValue();
         if (token != null){
             try{
