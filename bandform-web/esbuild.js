@@ -22,7 +22,11 @@ async function main() {
   });
 
   if (isServe) {
-    const { port } = await ctx.serve({ servedir: ".", port: 3000, host: "localhost" });
+    // `fallback` serves index.html for any request that doesn't match a real
+    // file, so refreshing/deep-linking a client-side route (e.g. /login) loads
+    // the app instead of 404ing (BrowserRouter then renders the route). The
+    // bundle is referenced by absolute path in index.html, so it still resolves.
+    const { port } = await ctx.serve({ servedir: ".", fallback: "index.html", port: 3000, host: "localhost" });
     console.log(`⚡ Dev server running at http://localhost:${port} ⚡`);
   } else {
     await ctx.rebuild();

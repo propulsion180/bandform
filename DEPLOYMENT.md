@@ -84,8 +84,22 @@ bandform.example {
     }
 }
 ```
-Caddy terminates TLS automatically; with nginx, add a `proxy_set_header Upgrade`/`Connection`
-block on `/graphql-ws` for the WebSocket upgrade.
+The `try_files {path} /index.html` line is the **SPA fallback**: any route that isn't a real file
+(e.g. a refresh on `/login`) serves `index.html` so the client-side router renders it instead of
+404ing. The nginx equivalent:
+```nginx
+location / {
+    try_files $uri /index.html;
+}
+location ~ ^/graphql(-ws)?$ {
+    proxy_pass http://localhost:8080;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;      # WebSocket upgrade for /graphql-ws
+    proxy_set_header Connection "upgrade";
+}
+```
+Caddy terminates TLS automatically; nginx needs the `Upgrade`/`Connection` headers shown above for
+the `/graphql-ws` WebSocket.
 
 ## Pre-flight checklist
 - [ ] `SERVER_JWT_SECRET` is ≥ 32 bytes and not the dev value.
