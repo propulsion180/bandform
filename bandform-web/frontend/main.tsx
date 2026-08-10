@@ -10,17 +10,23 @@ import { createClient } from "graphql-ws";
 import { AuthProvider } from "./auth/AuthContext";
 import NotificationListener from "./components/NotificationListener";
 
+// Backend origin, injected by esbuild (see esbuild.js `define`). Empty string
+// means "same origin" -- used for the reverse-proxy production deploy, where the
+// URLs become relative (/graphql) and the WS scheme follows the page protocol.
+declare const __BF_API_ORIGIN__: string;
+const API_ORIGIN = __BF_API_ORIGIN__;
+
 const httpLink = new HttpLink({
-  uri: "http://localhost:8080/graphql",
+  uri: `${API_ORIGIN}/graphql`,
   credentials: "include",
 });
 
 // The session cookie rides along on the WS upgrade request automatically,
 // same as credentials:"include" does for HttpLink -- see SecurityConfig.
-// If this app is ever served over https, this needs to become wss://.
-const wsLink = new GraphQLWsLink(
-  createClient({ url: "ws://localhost:8080/graphql-ws" })
-);
+const wsUrl = API_ORIGIN
+  ? `${API_ORIGIN.replace(/^http/, "ws")}/graphql-ws`
+  : `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/graphql-ws`;
+const wsLink = new GraphQLWsLink(createClient({ url: wsUrl }));
 
 const splitLink = split(
   ({ query }) => {

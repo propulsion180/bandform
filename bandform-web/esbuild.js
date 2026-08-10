@@ -11,6 +11,13 @@ async function main() {
     minify: !isServe,
     sourcemap: isServe,
     loader: { ".ts": "tsx" },
+    // Backend origin baked in at build time. Default suits local dev (frontend
+    // :3000 -> backend :8080). For a same-origin reverse-proxy deployment build
+    // with `BF_API_ORIGIN= pnpm build` (empty -> relative URLs); for a separate
+    // backend host use `BF_API_ORIGIN=https://api.example.com pnpm build`.
+    define: {
+      __BF_API_ORIGIN__: JSON.stringify(process.env.BF_API_ORIGIN ?? "http://localhost:8080"),
+    },
     plugins: [sassPlugin()],
   });
 
