@@ -47,7 +47,7 @@ public class BandService {
         return id;
     }
 
-    public Band createBand(String name, String desc, String city, String country, List<String> genreNames){
+    public Band createBand(String name, String desc, String city, String country, List<String> genreNames, User owner){
         log.debug("Creating band named: {}", name);
         Band b = new Band();
         b.setName(name);
@@ -55,6 +55,7 @@ public class BandService {
         b.setCity(city);
         b.setCountry(country);
         b.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));
+        b.setOwner(owner);
         return bandRepository.save(b);
     }
 

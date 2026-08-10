@@ -33,6 +33,10 @@ public class BandMemberService {
         return bandMemberRepository.findByBandId(bandId).orElseThrow(() -> new NoSuchElementException("No bandmembers in band with Id " + bandId));
     }
 
+    public BandMember getBandMemberById(Long id){
+        return bandMemberRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No band member with ID " + id));
+    }
+
     public BandMember createBandMember(Band band, User user, List<Instrument> instruments, String role){
         BandMember bm = new BandMember();
         bm.setUser(user);

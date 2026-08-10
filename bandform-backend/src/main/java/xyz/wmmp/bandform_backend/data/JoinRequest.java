@@ -1,6 +1,7 @@
 package xyz.wmmp.bandform_backend.data;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,6 +41,7 @@ public class JoinRequest {
     )
     private List<Instrument> interestedInstruments = new ArrayList<>();
 
+    @Size(max = 1000)
     @Column(length = 1000)
     private String message;
 
@@ -49,4 +51,12 @@ public class JoinRequest {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RequestStatus status = RequestStatus.PENDING;
+
+    // false: the musician (user) requested to join the band.
+    // true: the band invited the musician; proposedRole is the role offered.
+    @Column(nullable = false)
+    private boolean invitedByBand = false;
+
+    @Size(max = 100)
+    private String proposedRole;
 }

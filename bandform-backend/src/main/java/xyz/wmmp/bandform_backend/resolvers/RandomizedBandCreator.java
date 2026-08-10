@@ -3,6 +3,7 @@ package xyz.wmmp.bandform_backend.resolvers;
 import jakarta.persistence.ManyToMany;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import xyz.wmmp.bandform_backend.data.Band;
@@ -11,6 +12,7 @@ import xyz.wmmp.bandform_backend.data.User;
 import xyz.wmmp.bandform_backend.data.UserStatus;
 import xyz.wmmp.bandform_backend.services.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +38,7 @@ public class RandomizedBandCreator {
     }
 
 
+    @PreAuthorize("isAuthenticated() and (hasAnyRole('ADMIN', 'OWNER') or #yourUID.toString() == authentication.principal)")
     @MutationMapping
     public Band randomizedBandCreator(
             @Argument Long yourUID,
@@ -50,7 +53,7 @@ public class RandomizedBandCreator {
             @Argument Integer instrumentSearchDepth
     ){
         User u = userService.getUserById(yourUID);
-        Band b = bandService.createBand(name, description, city, country, genres);
+        Band b = bandService.createBand(name, description, city, country, genres, u);
 
         //find and add users as members without asking for their consent
         List<Instrument> instrus = instrumentService.getInstrumentsByNameAndAddIfNecessary(instruments);
@@ -63,7 +66,7 @@ public class RandomizedBandCreator {
         for(Instrument i : instrus){
             Boolean found = false;
             for(int j=0; j < instrumentSearchDepth; j++) {
-                for (User us : scoredUsers.keySet()) {
+                for (User us : new ArrayList<>(scoredUsers.keySet())) {
                     if(us.getInstruments().size() <= j){continue;}
                     if (us.getStatus() == UserStatus.BAND || us.getStatus() == UserStatus.BANDSEL || us.getStatus() == UserStatus.NOBANDSEL) {
                         scoredUsers.remove(us);

@@ -61,18 +61,17 @@ public class BandPositionService {
     }
 
 
-   public Long updateBandPosition(Long bpId, Band band,  String instrument, String description, boolean filled, User filler){
+   public Long updateBandPosition(Long bpId, Band band,  String instrument, String description, Boolean filled, User filler){
         BandPosition bp = bandPositionRepository.findById(bpId).orElse(null);
         if(bp == null){return null;}
 
-        if(band != null && band != null){bp.setBand(band);}
+        if(band != null){bp.setBand(band);}
         if(instrument != null && !instrument.isBlank()){bp.setInstrument(instrumentService.getInstrumentsByNameAndAddIfNecessary(List.of(instrument)).getFirst());}
         if(description != null && !description.isBlank()){bp.setDescription(description);}
-        bp.setFilled(filled);
+        if(filled != null){bp.setFilled(filled);}
         if(filler != null && !filler.equals(bp.getFilledBy())){bp.setFilledBy(filler);}
         bandPositionRepository.save(bp);
         return bpId;
-        //this kinda sucks. why returning true?
    }
 
    public Long deleteBandPosition(Long bpId){ //should not need this after first setup.

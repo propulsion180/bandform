@@ -5,6 +5,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import xyz.wmmp.bandform_backend.data.User;
 import xyz.wmmp.bandform_backend.data.UserProfile;
@@ -21,6 +22,13 @@ public class UserResolver{
     @Autowired
     public UserResolver(UserService userService){
         this.userService = userService;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @QueryMapping
+    public UserProfile me(){
+        Long uid = Long.parseLong((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        return userService.getUserProfileById(uid);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -45,13 +53,14 @@ public class UserResolver{
             @Argument String country,
             @Argument String description,
             @Argument List<String> genres,
-            @Argument List<String> instruments
+            @Argument List<String> instruments,
+            @Argument UserStatus status
     ){
-        return userService.createUser(name, email, plainPassword, age, city, country, description, genres, instruments);
+        return userService.createUser(name, email, plainPassword, age, city, country, description, genres, instruments, status);
     }
 
 
-    @PreAuthorize("isAuthenticated() and hasAnyRole('ADMIN', 'OWNER') or #id == authentication.principal.id")
+    @PreAuthorize("isAuthenticated() and (hasAnyRole('ADMIN', 'OWNER') or #id.toString() == authentication.principal)")
     @MutationMapping
     public Long updateUser(
             @Argument Long id,
@@ -68,9 +77,21 @@ public class UserResolver{
         return userService.updateUser(id, name, email, age, city, country, description, status, genres, instruments, null, null);
     }
 
-    @PreAuthorize("isAuthenticated() and hasAnyRole('ADMIN', 'OWNER') or #id == authentication.principal.id")
+    @PreAuthorize("isAuthenticated() and (hasAnyRole('ADMIN', 'OWNER') or #id.toString() == authentication.principal)")
     @MutationMapping
     public Long deleteUser(@Argument Long id){
          return userService.deleteUser(id);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @MutationMapping
+    public boolean unlockUser(@Argument Long id){
+        return userService.unlockUser(id);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @MutationMapping
+    public String adminResetPassword(@Argument Long id){
+        return userService.adminResetPassword(id);
     }
 }

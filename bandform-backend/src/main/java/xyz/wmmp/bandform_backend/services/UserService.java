@@ -5,20 +5,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import xyz.wmmp.bandform_backend.authsec.PasswordPolicy;
 import xyz.wmmp.bandform_backend.data.*;
 import xyz.wmmp.bandform_backend.repositories.GenreRepository;
 import xyz.wmmp.bandform_backend.repositories.InstrumentRepository;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -35,12 +36,14 @@ public class UserService {
     private final InstrumentService instrumentService;
     private final BandMemberService bandMemberService;
     private final PasswordEncoder passwordEncoder;
+    private final BandAuthorizationService bandAuthorizationService;
+    private final PasswordPolicy passwordPolicy;
 
     String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     Pattern p = Pattern.compile(emailRegex);
 
     @Autowired
-    public UserService(UserRepository userRepository, GenreRepository genreRepository, InstrumentRepository instrumentRepository, GenreService genreService, InstrumentService instrumentService, BandMemberService bandMemberService, PasswordEncoder passwordEncoder){
+    public UserService(UserRepository userRepository, GenreRepository genreRepository, InstrumentRepository instrumentRepository, GenreService genreService, InstrumentService instrumentService, BandMemberService bandMemberService, PasswordEncoder passwordEncoder, BandAuthorizationService bandAuthorizationService, PasswordPolicy passwordPolicy){
         this.userRepository = userRepository;
         this.genreRepository = genreRepository;
         this.instrumentRepository = instrumentRepository;
@@ -48,6 +51,8 @@ public class UserService {
         this.instrumentService = instrumentService;
         this.bandMemberService = bandMemberService;
         this.passwordEncoder = passwordEncoder;
+        this.bandAuthorizationService = bandAuthorizationService;
+        this.passwordPolicy = passwordPolicy;
     }
 
     public List<UserProfile> getAllUsers(){
@@ -66,21 +71,71 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("user with this ID doesn't exist :(. This should only be triggered within nested calls."));
     }
 
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    /**
+     * Admin action: replace the user's password with a freshly generated temp one,
+     * revoke any live session, and clear lockout state. Returns the plaintext temp
+     * password exactly once (to the calling admin); it is never stored in plaintext.
+     */
+    public String adminResetPassword(Long id){
+        log.debug("Admin resetting password for user id: {}", id);
+        User u = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("A user with this ID doesn't exist :("));
+        String tempPassword = generateTempPassword();
+        u.setPasswordHash(passwordEncoder.encode(tempPassword));
+        u.setJtiToken(null);
+        u.setTokenExpiry(null);
+        u.setLocked(false);
+        u.setFailedLoginAttempts(0);
+        userRepository.save(u);
+        return tempPassword;
+    }
+
+    // 12 chars with at least one upper, lower, and digit -> always satisfies
+    // PasswordPolicy. Excludes visually ambiguous characters (0/O/1/I/l).
+    private String generateTempPassword(){
+        String upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        String lower = "abcdefghijkmnpqrstuvwxyz";
+        String digits = "23456789";
+        String all = upper + lower + digits;
+        List<Character> chars = new ArrayList<>();
+        chars.add(upper.charAt(RANDOM.nextInt(upper.length())));
+        chars.add(lower.charAt(RANDOM.nextInt(lower.length())));
+        chars.add(digits.charAt(RANDOM.nextInt(digits.length())));
+        for(int i = 0; i < 9; i++){
+            chars.add(all.charAt(RANDOM.nextInt(all.length())));
+        }
+        Collections.shuffle(chars, RANDOM);
+        StringBuilder sb = new StringBuilder();
+        for(char c : chars){ sb.append(c); }
+        return sb.toString();
+    }
+
+    public boolean unlockUser(Long id){
+        log.debug("Unlocking user with id: {}", id);
+        User u = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("A user with this ID doesn't exist :("));
+        u.setLocked(false);
+        u.setFailedLoginAttempts(0);
+        userRepository.save(u);
+        return true;
+    }
+
     public Long deleteUser(Long id){
+        bandAuthorizationService.requireSelf(id);
         log.debug("Deleting user with id: {}", id);
         userRepository.deleteById(id);
         log.debug("Deleted!!");
         return id;
     }
 
-    public UserProfile createUser(String name, String email, String plainPassword, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames){
+    public UserProfile createUser(String name, String email, String plainPassword, Integer age, String city, String country, String desc, List<String> genreNames, List<String> instrumentNames, UserStatus status){
         log.debug("Creating user");
         if(userRepository.findByName(name).isPresent()){ throw new IllegalArgumentException("UserName already taken"); }
         User u = new User();
         u.setName(name);
-        if(p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
+        if(!p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
         u.setEmail(email);
-        if(plainPassword.length() < 8){ throw new IllegalArgumentException("Password needs to be larger than 8 characters"); }
+        passwordPolicy.validate(plainPassword);
         u.setPasswordHash(passwordEncoder.encode(plainPassword));
         if(age < 16 || age > 120){ throw new IllegalArgumentException("Must be 16 or older to use this service");}
         u.setAge(age);
@@ -90,14 +145,19 @@ public class UserService {
         u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));
         u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));
         u.setRole(UserType.NORMAL);
+        if(status != null){
+            if(status != UserStatus.NOBANDRAND && status != UserStatus.NOBANDSEL){
+                throw new IllegalArgumentException("A new user has no band yet; status must be NOBANDRAND or NOBANDSEL");
+            }
+            u.setStatus(status);
+        }
         return UserProfile.from(userRepository.save(u));
     }
 
     public Long updateUser(Long uid, String name, String email, Integer age, String city, String country, String desc, UserStatus status, List<String> genreNames, List<String> instrumentNames, List<BandMember> memberships, List<Notification> notifications){
 
-       Long upid = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-       if(upid == null){throw new InsufficientAuthenticationException("Only logged in people can update users");}
-       if(upid != uid){           
+       Long upid = Long.parseLong((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+       if(!upid.equals(uid)){
            User updater = userRepository.findById(upid).orElseThrow(() -> new IllegalArgumentException());
            if(updater.getRole() == UserType.NORMAL){throw new AccessDeniedException("Unpriveledged access!!!! by: " + updater.getName() + " uid: " + upid);}
        }
@@ -106,13 +166,24 @@ public class UserService {
        User u = userRepository.findById(uid).orElse(null);
        if(u == null){return null;}
        if(name != null && !name.isBlank()){u.setName(name);}
-       if(p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
-       if(email != null && !email.isBlank()){u.setEmail(email);}
+       if(email != null && !email.isBlank()){
+           if(!p.matcher(email).matches()){ throw new IllegalArgumentException("Invalid Email Address!"); }
+           u.setEmail(email);
+       }
        if(age != null){u.setAge(age);}
        if(city != null && !city.isBlank()){u.setCity(city);}
        if(country != null && !country.isBlank()){u.setCountry(country);}
        if(desc != null && !desc.isBlank()){u.setDescription(desc);}
-       if(status != null){u.setStatus(status);}
+       if(status != null){
+           boolean inBand = !u.getBandMemberships().isEmpty();
+           boolean statusIsInBand = status == UserStatus.BAND || status == UserStatus.BANDRAND || status == UserStatus.BANDSEL;
+           if(inBand != statusIsInBand){
+               throw new IllegalArgumentException(inBand
+                       ? "User is in a band; status must be BAND, BANDRAND, or BANDSEL"
+                       : "User is not in a band; status must be NOBANDRAND or NOBANDSEL");
+           }
+           u.setStatus(status);
+       }
        if(genreNames != null){u.setGenres(genreService.getGenresByNameAndAddIfNecessary(genreNames));}
        if(instrumentNames != null){u.setInstruments(instrumentService.getInstrumentsByNameAndAddIfNecessary(instrumentNames));}
        if(memberships != null){u.setBandMemberships(memberships);}

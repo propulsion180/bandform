@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,9 +27,11 @@ public class User {
 
         @NotEmpty
         @NotNull
+        @Size(max = 50)
         @Column(nullable = false)
         private String name;
 
+        @Size(max = 254)
         @Column(nullable = false)
         private String email;
 
@@ -42,27 +45,43 @@ public class User {
         @JsonIgnore
         private Instant tokenExpiry;
 
+        // Last successful login origin, for the admin monitoring view. Exposed
+        // only to the user themselves or an admin (see UserFieldResolver).
+        // lastLoginCountry stays null until IP->country resolution is added.
+        private String lastLoginIp;
+
+        private Instant lastLoginAt;
+
+        private String lastLoginCountry;
+
         @NotNull
         @Column(nullable = false)
         private Integer age;
 
         @NotEmpty
         @NotBlank
+        @Size(max = 100)
         private String city;
 
         @NotEmpty
         @NotBlank
+        @Size(max = 100)
         private String country;
 
+        @Size(max = 500)
+        @Column(length = 500)
         private String description;
 
-        @NotEmpty
-        @NotBlank
+        @NotNull
         @Enumerated(EnumType.STRING)
         @Column(nullable = false)
         private UserType role;
 
         private boolean locked = false;
+
+        @JsonIgnore
+        @Column(nullable = false)
+        private int failedLoginAttempts = 0;
 
         @Enumerated(EnumType.STRING)
         @Column(nullable = false)

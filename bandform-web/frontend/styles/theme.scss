@@ -1,0 +1,84 @@
+// Light/dark color values for the semantic tokens declared in tokens.scss.
+// Default follows the OS preference; an explicit [data-theme] attribute on
+// <html> (set by useTheme()) overrides it and is persisted to localStorage.
+
+// "Analog warmth" -- vintage amp/tube aesthetic. Light is warm cream/paper,
+// dark is espresso/walnut. Amber stays the action/focus color; the accent-2
+// brick/tube-red family is the secondary "flavor" color (links, badge-accent,
+// own chat bubbles). Danger sits at crimson hue ~18 so it stays visually
+// distinct from accent-2's brick hue ~33.
+@mixin light-theme {
+  --color-bg: oklch(95% 0.020 85);
+  --color-surface: oklch(98% 0.012 90);
+  --color-surface-alt: oklch(91% 0.026 85);
+  --color-border: oklch(83% 0.035 80);
+  --color-text: oklch(24% 0.020 60);
+  --color-text-muted: oklch(43% 0.025 65);
+  --color-text-faint: oklch(58% 0.025 70);
+  --color-accent: oklch(50% 0.130 50);
+  --color-accent-hover: oklch(42% 0.110 50);
+  --color-accent-muted: oklch(92% 0.045 55);
+  --color-accent-contrast: oklch(100% 0 0);
+  --color-accent-2: oklch(45% 0.115 33);
+  --color-accent-2-hover: oklch(38% 0.100 33);
+  --color-accent-2-muted: oklch(92% 0.038 33);
+  --color-accent-2-contrast: oklch(100% 0 0);
+  --color-success: oklch(50% 0.105 130);
+  --color-success-muted: oklch(92% 0.048 130);
+  --color-warning: oklch(55% 0.112 75);
+  --color-warning-muted: oklch(93% 0.052 75);
+  --color-danger: oklch(48% 0.185 18);
+  --color-danger-muted: oklch(92% 0.035 18);
+}
+
+@mixin dark-theme {
+  --color-bg: oklch(18% 0.015 55);
+  --color-surface: oklch(25% 0.018 55);
+  --color-surface-alt: oklch(33% 0.022 58);
+  --color-border: oklch(45% 0.030 60);
+  --color-text: oklch(93% 0.018 85);
+  --color-text-muted: oklch(79% 0.018 82);
+  --color-text-faint: oklch(65% 0.016 78);
+  --color-accent: oklch(72% 0.165 55);
+  --color-accent-hover: oklch(63% 0.150 55);
+  --color-accent-muted: oklch(30% 0.060 55);
+  --color-accent-contrast: oklch(16% 0.020 55);
+  --color-accent-2: oklch(64% 0.135 33);
+  --color-accent-2-hover: oklch(57% 0.120 33);
+  --color-accent-2-muted: oklch(28% 0.058 33);
+  --color-accent-2-contrast: oklch(15% 0.020 33);
+  --color-success: oklch(76% 0.150 130);
+  --color-success-muted: oklch(27% 0.055 130);
+  --color-warning: oklch(83% 0.160 80);
+  --color-warning-muted: oklch(28% 0.055 80);
+  --color-danger: oklch(66% 0.200 18);
+  --color-danger-muted: oklch(26% 0.075 18);
+
+  // The base shadow opacities in tokens.scss are calibrated for the light
+  // theme; on the 18%-lightness espresso bg they all but disappear, so the
+  // dark theme redraws them at much higher opacity (same directional
+  // geometry) with a faint 1px rim to keep silhouettes crisp.
+  --shadow-sm: 0 0 0 1px rgba(0, 0, 0, 0.20), 2px 3px 6px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 0 0 1px rgba(0, 0, 0, 0.25), 3px 8px 22px rgba(0, 0, 0, 0.65);
+  --shadow-lg: 0 0 0 1px rgba(0, 0, 0, 0.30), 6px 18px 46px rgba(0, 0, 0, 0.80);
+  --shadow-inset-sm: inset 3px 3px 5px rgba(0, 0, 0, 0.6), inset -2px -2px 3px rgba(255, 255, 255, 0.06);
+}
+
+:root {
+  color-scheme: light dark;
+  @include light-theme;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    @include dark-theme;
+  }
+}
+
+:root[data-theme="dark"] {
+  @include dark-theme;
+}
+
+:root[data-theme="light"] {
+  @include light-theme;
+}

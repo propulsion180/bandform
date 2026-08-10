@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import xyz.wmmp.bandform_backend.data.User;
 
+import java.time.Instant;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -18,6 +19,12 @@ import static java.util.stream.Collectors.toList;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     Optional<User> findByName(String name);
+
+    // Monitoring metrics (see MonitoringResolver).
+    long countByLockedTrue();
+    long countByJtiTokenIsNotNullAndTokenExpiryAfter(Instant instant);
+    long countByFailedLoginAttemptsGreaterThan(int value);
+    List<User> findTop10ByLastLoginAtIsNotNullOrderByLastLoginAtDesc();
 }
 
 //@Repository

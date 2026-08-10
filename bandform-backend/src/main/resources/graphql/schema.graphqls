@@ -34,13 +34,25 @@ type Instrument {
 type User{
     id: ID!
     name: String!
-    email: String!
+    # Only resolved for the user themselves or a global admin/owner
+    # (see UserFieldResolver); null for everyone else.
+    email: String
     age: Int!
     city: String!
     country: String!
     description: String!
     role: UserType!
     status: UserStatus!
+    # Whether the account is locked out (too many failed logins). Only resolved
+    # for the user themselves or a global admin/owner (see UserFieldResolver);
+    # null for everyone else.
+    locked: Boolean
+    # Last-login origin, for the admin monitoring view. Same self/admin-only
+    # guard as email/locked; null for everyone else. lastLoginCountry is not yet
+    # populated (IP->country resolution deferred).
+    lastLoginIp: String
+    lastLoginAt: String
+    lastLoginCountry: String
     genres: [Genre]!
     instruments: [Instrument]!
     bandMemberships: [BandMember]!
@@ -65,6 +77,7 @@ type Band {
     members: [BandMember]!
     openPositions: [BandPosition]!
     joinRequests: [JoinRequest]!
+    owner: User
 }
 
 type BandMember {
@@ -85,6 +98,8 @@ type JoinRequest{
     message: String
     requestedDate: String
     status: RequestStatus!
+    invitedByBand: Boolean!
+    proposedRole: String
 }
 
 type LoginResult {
@@ -96,21 +111,85 @@ type Notification {
     user: User!
     message: String!
     read: Boolean!
-    from: String!
+    sender: String!
+}
+
+type Message {
+    id: ID!
+    band: Band!
+    sender: User!
+    body: String!
+    sentAt: String!
+}
+
+type RecentLogin {
+    userId: ID!
+    name: String!
+    ip: String
+    country: String
+    at: String
+}
+
+# Admin-only runtime + application metrics snapshot (see MonitoringResolver).
+# Byte/cumulative values are Float to avoid 32-bit Int overflow.
+type SystemMetrics {
+    # System & JVM
+    systemCpuLoad: Float!
+    processCpuLoad: Float!
+    availableProcessors: Int!
+    systemMemoryTotal: Float!
+    systemMemoryFree: Float!
+    heapUsed: Float!
+    heapMax: Float!
+    nonHeapUsed: Float!
+    threadCount: Int!
+    peakThreadCount: Int!
+    daemonThreadCount: Int!
+    gcCount: Float!
+    gcTimeMs: Float!
+    uptimeMs: Float!
+    startTime: String!
+    diskTotal: Float!
+    diskFree: Float!
+    # Database
+    dbReachable: Boolean!
+    dbPoolActive: Int
+    dbPoolIdle: Int
+    dbPoolPending: Int
+    dbPoolTotal: Int
+    dbPoolMax: Int
+    # Traffic (since startup)
+    graphqlRequests: Float!
+    graphqlErrors: Float!
+    graphqlAvgLatencyMs: Float!
+    # App & Security
+    totalUsers: Int!
+    totalBands: Int!
+    openPositions: Int!
+    pendingJoinRequests: Int!
+    totalMessages: Int!
+    activeSessions: Int!
+    lockedAccounts: Int!
+    usersWithFailedLogins: Int!
+    recentLogins: [RecentLogin!]!
 }
 
 type Query {
+    me: User
     users: [User!]!
     user(id: ID!): User
     bands: [Band!]!
     band(id: ID!): Band
-    bandPositions(id: ID!): BandPosition
+    bandPosition(id: ID!): BandPosition
     positionsInBand(bId: ID!): [BandPosition!]
     membersInBand(bID: ID!): [BandMember!]
     joinRequest(id: ID!): JoinRequest
     userJoinRequests(uID: ID!): [JoinRequest!]
     bandJoinRequests(bID: ID!): [JoinRequest!]
-#    todo add recommenders
+    recommendBand(withinCity: Boolean!, withinCountry: Boolean!, sameGenre: Boolean!, locGenreWeight: Int!): [Band!]!
+    recommendUser(bp: ID!, withinCity: Boolean!, withinCountry: Boolean!, sameGenre: Boolean!, singleInstrument: Boolean!, locGenreWeight: Int!): [User!]!
+    bandMessages(bandId: ID!, limit: Int, before: ID): [Message!]!
+    systemMetrics: SystemMetrics!
 }
 
 type Mutation {
@@ -124,20 +203,29 @@ type Mutation {
         description: String!
         genres: [String!]!
         instruments: [String!]!
+        status: UserStatus
     ): User!
 
     updateUser(
         id: ID!,
         name: String
+        email: String
         age: Int
         city: String
         country: String
         description: String
+        status: UserStatus
         genres: [String!]
         instruments: [String!]
     ): ID
 
     deleteUser(id: ID!): ID
+
+    unlockUser(id: ID!): Boolean!
+
+    # Admin-only: resets the user's password to a freshly generated temp password,
+    # revokes their sessions, and returns the temp password once for the admin to relay.
+    adminResetPassword(id: ID!): String!
 
     createBand(
         name: String!
@@ -187,8 +275,16 @@ type Mutation {
     createJoinRequest(
         uID: ID!
         bID: ID!
-        bpID: ID!
+        bpId: ID!
         interestedInstruments: [String!]
+        message: String
+    ): JoinRequest
+
+    inviteToBand(
+        bID: ID!
+        bpId: ID!
+        uID: ID!
+        proposedRole: String!
         message: String
     ): JoinRequest
 
@@ -198,14 +294,32 @@ type Mutation {
 
     accept(
         id: ID!
-        bandRole: String!
+        bandRole: String
     ): ID
 
     login(name: String!, password: String!): LoginResult!
     logout: Boolean!
     changePassword(newPassword: String!): Boolean!
+
+    randomizedBandCreator(
+        yourUID: ID!
+        yourInstrument: String!
+        yourRole: String
+        name: String!
+        instruments: [String!]!
+        city: String!
+        country: String!
+        genres: [String!]!
+        description: String!
+        instrumentSearchDepth: Int!
+    ): Band!
+
+    sendMessage(bandId: ID!, body: String!): Message!
+
+    issueWsTicket: String!
 }
 
 type Subscription {
-    notifications: Notification!
+    notifications(ticket: String!): Notification!
+    messageAdded(bandId: ID!, ticket: String!): Message!
 }

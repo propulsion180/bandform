@@ -1,8 +1,9 @@
 package xyz.wmmp.bandform_backend.data;
 
+import java.time.Instant;
 import java.util.List;
 
-public record UserProfile (Long id, String name, String email, Integer age, String city, String country, String description, UserType role, UserStatus status, List<Genre> genres, List<Instrument> instruments, List<BandMember> members){
+public record UserProfile (Long id, String name, String email, Integer age, String city, String country, String description, UserType role, UserStatus status, boolean locked, String lastLoginIp, Instant lastLoginAt, String lastLoginCountry, List<Genre> genres, List<Instrument> instruments, List<BandMember> bandMemberships){
     public static UserProfile from(User user){
         return new UserProfile(
                 user.getId(),
@@ -14,6 +15,10 @@ public record UserProfile (Long id, String name, String email, Integer age, Stri
                 user.getDescription(),
                 user.getRole(),
                 user.getStatus(),
+                user.isLocked(),
+                user.getLastLoginIp(),
+                user.getLastLoginAt(),
+                user.getLastLoginCountry(),
                 user.getGenres(),
                 user.getInstruments(),
                 user.getBandMemberships()

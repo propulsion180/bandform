@@ -2,13 +2,8 @@ package xyz.wmmp.bandform_backend;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import xyz.wmmp.bandform_backend.data.User;
-
-import java.util.ArrayList;
 
 
 @SpringBootApplication

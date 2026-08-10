@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import jdk.jfr.Enabled;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,14 +27,19 @@ public class Band{
 
     @NotEmpty
     @NotBlank
+    @Size(max = 100)
     @Column(nullable = false)
     private String name;
 
 
+    @Size(max = 1000)
+    @Column(length = 1000)
     private String description;
 
+    @Size(max = 100)
     private String city;
 
+    @Size(max = 100)
     private String country;
 
     @ManyToMany
@@ -53,5 +59,10 @@ public class Band{
     @OneToMany(mappedBy = "band", cascade = CascadeType.ALL)
     private List<JoinRequest> joinRequests = new ArrayList<>();
 
+    // Per-band creator/manager -- distinct from the site-wide UserType.OWNER
+    // role. Any user, regardless of global role, owns the bands they create.
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
 }

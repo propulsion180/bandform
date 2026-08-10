@@ -1,67 +1,48 @@
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import ReactDOM from "react-dom";
-import {
-  useNavigate,
-  Routes,
-  Route,
-  BrowserRouter as Router,
-} from "react-router-dom";
-import Main from "./Main";
-import Login from "./Login";
-import Signup from "./Signup";
-import Admin from "./Admin";
-import Header from "./Header";
-import { LoginMutation } from "./gql/graphql";
-import Band from "./Band";
+import React from "react";
+import { BrowserRouter as Router, Navigate, useLocation } from "react-router-dom";
+import Header from "./components/Header";
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Desktop from "./pages/Desktop";
+import MobileApp from "./pages/MobileApp";
+import { useAuth } from "./auth/AuthContext";
+import { WindowManagerProvider } from "./windows/WindowManagerContext";
+import { useIsDesktopViewport } from "./windows/useIsDesktopViewport";
 
+const RootSwitch: React.FC = () => {
+  const { user, loading } = useAuth();
+  const isDesktop = useIsDesktopViewport();
+  const location = useLocation();
 
+  if (loading) {
+    return <div className="page">Loading...</div>;
+  }
 
-const App: React.FC = () => {
-  console.log("starting");
-  const [user, setUser] = useState<LoginMutation['login']['user'] | null >(null);
-    // useEffect(() => {
-  //   fetch("https://" + host + "/tknlgn")
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error(`HTTP error! status ${response.status}`);
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data: LoginResponse) => {
-  //       console.log(data.message);
-  //       setUser(data.username);
-  //       setAdmin(data.admin);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching nodes", error);
-  //     });
-  // }, []);
-  
-  const host = window.location.host;
+  if (location.pathname === "/login") return <Login />;
+  if (location.pathname === "/signup") return <Signup />;
 
-  return (
-    <div className="center">
-      <Router>
-        <Header user={user} setUser={setUser} />
-        <Routes>
-          <Route path="/" element={<Main user={user} />} />
-          <Route path="/band" element={<Band user={user} />} />
-          <Route
-            path="/login"
-            element={
-              <Login setUser={setUser} />
-            }
-          />
-          <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/admin"
-            element={<Admin user={user} />}
-          />
-        </Routes>
-      </Router>
-    </div>
-  );
+  if (!user) {
+    if (location.pathname === "/") {
+      return (
+        <>
+          <Header />
+          <Landing />
+        </>
+      );
+    }
+    return <Navigate to="/login" replace />;
+  }
+
+  return isDesktop ? <Desktop /> : <MobileApp />;
 };
+
+const App: React.FC = () => (
+  <Router>
+    <WindowManagerProvider>
+      <RootSwitch />
+    </WindowManagerProvider>
+  </Router>
+);
 
 export default App;
