@@ -7,8 +7,27 @@ export interface WindowLayout {
   height: number;
 }
 
+const STORAGE_PREFIX = "bandform-window:";
+
 function storageKey(id: string): string {
-  return `bandform-window:${id}`;
+  return `${STORAGE_PREFIX}${id}`;
+}
+
+// Drops every persisted window layout. Used when the session resets (logout /
+// user switch) so one user's arrangement doesn't carry over to the next.
+export function clearStoredLayouts(): void {
+  try {
+    const keys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(STORAGE_PREFIX)) {
+        keys.push(key);
+      }
+    }
+    keys.forEach((key) => localStorage.removeItem(key));
+  } catch {
+    // storage unavailable -- nothing to clear
+  }
 }
 
 // Keeps a persisted layout inside the current viewport -- guards against a

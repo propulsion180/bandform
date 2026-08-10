@@ -1,4 +1,6 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useAuth } from "../auth/AuthContext";
+import { clearStoredLayouts } from "./useWindowLayout";
 
 // Keep these in sync with --z-window-base / --z-window-nav in styles/tokens.scss.
 export const Z_BASE = 100;
@@ -63,6 +65,34 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
   const closeWindow = useCallback((id: string) => {
     setOpenWindows((current) => current.filter((existing) => existing.id !== id));
   }, []);
+
+  // Reset the whole desktop to its default state -- close every window and drop
+  // persisted geometry -- so a session change starts fresh.
+  const reset = useCallback(() => {
+    setOpenWindows([]);
+    setOrder([]);
+    setMinimized({});
+    clearStoredLayouts();
+  }, []);
+
+  // Clear the desktop whenever the authenticated user changes (logout, or a
+  // switch to a different account) so windows/layout never carry across users.
+  // A ref baseline avoids resetting on the initial auth hydration or a plain
+  // page refresh -- only an actual identity change triggers a reset.
+  const { user, loading } = useAuth();
+  const previousUserId = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (loading) return;
+    const currentUserId = user?.id ?? null;
+    if (previousUserId.current === undefined) {
+      previousUserId.current = currentUserId;
+      return;
+    }
+    if (previousUserId.current !== currentUserId) {
+      previousUserId.current = currentUserId;
+      reset();
+    }
+  }, [user, loading, reset]);
 
   return (
     <WindowManagerContext.Provider
