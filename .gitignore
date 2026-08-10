@@ -31,3 +31,8 @@ go.work.sum
 # .idea/
 # .vscode/
 bandform-web/node_modules/
+
+# Eclipse / IDE project files
+.project
+.classpath
+.settings/
