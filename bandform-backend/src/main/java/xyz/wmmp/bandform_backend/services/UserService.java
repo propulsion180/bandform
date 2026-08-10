@@ -17,7 +17,9 @@ import xyz.wmmp.bandform_backend.repositories.GenreRepository;
 import xyz.wmmp.bandform_backend.repositories.InstrumentRepository;
 import xyz.wmmp.bandform_backend.repositories.UserRepository;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -67,6 +69,46 @@ public class UserService {
     public User getUserById(Long id){
         log.debug("User with id: {}, being retrieved", id);
         return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("user with this ID doesn't exist :(. This should only be triggered within nested calls."));
+    }
+
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    /**
+     * Admin action: replace the user's password with a freshly generated temp one,
+     * revoke any live session, and clear lockout state. Returns the plaintext temp
+     * password exactly once (to the calling admin); it is never stored in plaintext.
+     */
+    public String adminResetPassword(Long id){
+        log.debug("Admin resetting password for user id: {}", id);
+        User u = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("A user with this ID doesn't exist :("));
+        String tempPassword = generateTempPassword();
+        u.setPasswordHash(passwordEncoder.encode(tempPassword));
+        u.setJtiToken(null);
+        u.setTokenExpiry(null);
+        u.setLocked(false);
+        u.setFailedLoginAttempts(0);
+        userRepository.save(u);
+        return tempPassword;
+    }
+
+    // 12 chars with at least one upper, lower, and digit -> always satisfies
+    // PasswordPolicy. Excludes visually ambiguous characters (0/O/1/I/l).
+    private String generateTempPassword(){
+        String upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        String lower = "abcdefghijkmnpqrstuvwxyz";
+        String digits = "23456789";
+        String all = upper + lower + digits;
+        List<Character> chars = new ArrayList<>();
+        chars.add(upper.charAt(RANDOM.nextInt(upper.length())));
+        chars.add(lower.charAt(RANDOM.nextInt(lower.length())));
+        chars.add(digits.charAt(RANDOM.nextInt(digits.length())));
+        for(int i = 0; i < 9; i++){
+            chars.add(all.charAt(RANDOM.nextInt(all.length())));
+        }
+        Collections.shuffle(chars, RANDOM);
+        StringBuilder sb = new StringBuilder();
+        for(char c : chars){ sb.append(c); }
+        return sb.toString();
     }
 
     public boolean unlockUser(Long id){

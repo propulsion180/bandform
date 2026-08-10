@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useMutation } from "@apollo/client/react";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import { LOGOUT } from "../graphql/mutations";
 import { useAuth } from "../auth/AuthContext";
 import { useTheme } from "../hooks/useTheme";
@@ -13,6 +13,7 @@ export function NavLinks() {
   const { user, isAdmin, setUser } = useAuth();
   const { theme, toggle } = useTheme();
   const [logout] = useMutation(LOGOUT);
+  const client = useApolloClient();
 
   const handleLogout = async () => {
     try {
@@ -20,6 +21,9 @@ export function NavLinks() {
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
+      // Drop all cached data so a subsequent login (possibly as a different
+      // account) never renders the previous session's cached entities.
+      await client.clearStore();
       setUser(null);
       navigate("/");
     }
@@ -61,6 +65,11 @@ export function NavLinks() {
       {user != null && isAdmin && (
         <a className={linkClass("/admin")} onClick={() => openPath("/admin")}>
           Admin
+        </a>
+      )}
+      {user != null && isAdmin && (
+        <a className={linkClass("/monitoring")} onClick={() => openPath("/monitoring")}>
+          Monitoring
         </a>
       )}
       {user != null && (

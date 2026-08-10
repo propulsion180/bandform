@@ -4,7 +4,7 @@ import React, { createContext, useCallback, useContext, useState } from "react";
 export const Z_BASE = 100;
 export const Z_NAV = 300;
 
-export type WindowKind = "discover" | "requests" | "profile" | "create-band" | "admin" | "band-detail";
+export type WindowKind = "discover" | "requests" | "profile" | "create-band" | "admin" | "monitoring" | "band-detail";
 
 export interface OpenWindow {
   id: string;

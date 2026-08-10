@@ -88,4 +88,10 @@ public class UserResolver{
     public boolean unlockUser(@Argument Long id){
         return userService.unlockUser(id);
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @MutationMapping
+    public String adminResetPassword(@Argument Long id){
+        return userService.adminResetPassword(id);
+    }
 }

@@ -1,5 +1,7 @@
 package xyz.wmmp.bandform_backend.resolvers;
 
+import java.time.Instant;
+
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import xyz.wmmp.bandform_backend.data.User;
@@ -74,5 +76,54 @@ public class UserFieldResolver {
             return locked;
         }
         return null;
+    }
+
+    // Last-login origin fields, for the admin monitoring view. Same self/admin
+    // guard as email/locked.
+    @SchemaMapping(typeName = "User", field = "lastLoginIp")
+    public String lastLoginIp(Object source) {
+        if (source instanceof UserProfile up) {
+            return mayView(up.id()) ? up.lastLoginIp() : null;
+        } else if (source instanceof User u) {
+            return mayView(u.getId()) ? u.getLastLoginIp() : null;
+        }
+        return null;
+    }
+
+    @SchemaMapping(typeName = "User", field = "lastLoginAt")
+    public String lastLoginAt(Object source) {
+        Instant at;
+        Long targetId;
+        if (source instanceof UserProfile up) {
+            targetId = up.id();
+            at = up.lastLoginAt();
+        } else if (source instanceof User u) {
+            targetId = u.getId();
+            at = u.getLastLoginAt();
+        } else {
+            return null;
+        }
+        return (mayView(targetId) && at != null) ? at.toString() : null;
+    }
+
+    @SchemaMapping(typeName = "User", field = "lastLoginCountry")
+    public String lastLoginCountry(Object source) {
+        if (source instanceof UserProfile up) {
+            return mayView(up.id()) ? up.lastLoginCountry() : null;
+        } else if (source instanceof User u) {
+            return mayView(u.getId()) ? u.getLastLoginCountry() : null;
+        }
+        return null;
+    }
+
+    // True when the current viewer may see the target user's private fields:
+    // the target themselves, or a global admin/owner. Anonymous / WS-context
+    // reads (no SecurityContext) return false.
+    private boolean mayView(Long targetId) {
+        Long currentId = bandAuthorizationService.currentUserIdOrNull();
+        if (currentId == null) {
+            return false;
+        }
+        return currentId.equals(targetId) || bandAuthorizationService.isGlobalAdmin(currentId);
     }
 }

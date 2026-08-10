@@ -45,6 +45,15 @@ public class User {
         @JsonIgnore
         private Instant tokenExpiry;
 
+        // Last successful login origin, for the admin monitoring view. Exposed
+        // only to the user themselves or an admin (see UserFieldResolver).
+        // lastLoginCountry stays null until IP->country resolution is added.
+        private String lastLoginIp;
+
+        private Instant lastLoginAt;
+
+        private String lastLoginCountry;
+
         @NotNull
         @Column(nullable = false)
         private Integer age;

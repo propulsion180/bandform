@@ -48,14 +48,30 @@ public class AuthResolver {
         return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
     }
 
+    private static HttpServletRequest currentRequest(){
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+    }
+
     private static String sessionCookieValue(){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        HttpServletRequest request = currentRequest();
         Cookie[] cookies = request.getCookies();
         if(cookies == null){ return null; }
         for(Cookie c : cookies){
             if("session".equals(c.getName())){ return c.getValue(); }
         }
         return null;
+    }
+
+    // Best-effort client IP. Honours X-Forwarded-For (first hop) so it stays
+    // correct behind a reverse proxy in production; falls back to the socket
+    // address (which is 127.0.0.1 / ::1 for local dev).
+    private static String clientIp(){
+        HttpServletRequest request = currentRequest();
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if(forwarded != null && !forwarded.isBlank()){
+            return forwarded.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
     // After this many consecutive failed attempts the account is locked and
@@ -83,8 +99,10 @@ public class AuthResolver {
             throw new BadCredentialsException("Invalid username or password");
         }
 
-        // Successful login: clear the failed-attempt counter.
+        // Successful login: clear the failed-attempt counter and record origin.
         user.setFailedLoginAttempts(0);
+        user.setLastLoginIp(clientIp());
+        user.setLastLoginAt(Instant.now());
 
         String jti = UUID.randomUUID().toString();
         String token = jwtUtil.generateToken(jti, user.getId().toString(), user.getRole().toString());

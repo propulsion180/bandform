@@ -93,6 +93,12 @@ export const UNLOCK_USER = graphql(`
   }
 `);
 
+export const ADMIN_RESET_PASSWORD = graphql(`
+  mutation AdminResetPassword($id: ID!) {
+    adminResetPassword(id: $id)
+  }
+`);
+
 export const CREATE_BAND = graphql(`
   mutation CreateBand(
     $name: String!

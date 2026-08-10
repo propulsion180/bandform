@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { GET_ADMIN_BANDS, GET_ADMIN_USERS } from "../graphql/queries";
-import { DELETE_BAND, DELETE_USER, UNLOCK_USER } from "../graphql/mutations";
+import { ADMIN_RESET_PASSWORD, DELETE_BAND, DELETE_USER, UNLOCK_USER } from "../graphql/mutations";
 
 export default function Admin() {
   const [tab, setTab] = useState<"users" | "bands">("users");
@@ -9,13 +9,15 @@ export default function Admin() {
   const [bandFilter, setBandFilter] = useState("");
 
   const [loadUsers, { data: usersData, loading: usersLoading, refetch: refetchUsers }] =
-    useLazyQuery(GET_ADMIN_USERS);
+    useLazyQuery(GET_ADMIN_USERS, { fetchPolicy: "cache-and-network" });
   const [loadBands, { data: bandsData, loading: bandsLoading, refetch: refetchBands }] =
-    useLazyQuery(GET_ADMIN_BANDS);
+    useLazyQuery(GET_ADMIN_BANDS, { fetchPolicy: "cache-and-network" });
 
   const [deleteUser] = useMutation(DELETE_USER);
   const [unlockUser] = useMutation(UNLOCK_USER);
+  const [adminResetPassword] = useMutation(ADMIN_RESET_PASSWORD);
   const [deleteBand] = useMutation(DELETE_BAND);
+  const [resetResult, setResetResult] = useState<{ id: string; password: string } | null>(null);
 
   const selectTab = (next: "users" | "bands") => {
     setTab(next);
@@ -79,26 +81,47 @@ export default function Admin() {
                     {u.locked ? <span className="badge badge-danger">Locked</span> : "Active"}
                   </td>
                   <td>
-                    {u.locked && (
+                    <div className="table-actions">
+                      {u.locked && (
+                        <a
+                          className="small-button secondary"
+                          onClick={async () => {
+                            await unlockUser({ variables: { id: u.id } });
+                            refetchUsers();
+                          }}
+                        >
+                          Unlock
+                        </a>
+                      )}
                       <a
                         className="small-button secondary"
                         onClick={async () => {
-                          await unlockUser({ variables: { id: u.id } });
+                          setResetResult(null);
+                          const res = await adminResetPassword({ variables: { id: u.id } });
+                          const password = res.data?.adminResetPassword;
+                          if (password) {
+                            setResetResult({ id: u.id, password });
+                          }
+                        }}
+                      >
+                        Reset password
+                      </a>
+                      <a
+                        className="small-button danger"
+                        onClick={async () => {
+                          await deleteUser({ variables: { id: u.id } });
                           refetchUsers();
                         }}
                       >
-                        Unlock
+                        Delete
                       </a>
+                    </div>
+                    {resetResult?.id === u.id && (
+                      <p className="success-text">
+                        Temp password: <strong>{resetResult.password}</strong> — share it with the
+                        user; they'll need to log in with it. Shown once.
+                      </p>
                     )}
-                    <a
-                      className="small-button danger"
-                      onClick={async () => {
-                        await deleteUser({ variables: { id: u.id } });
-                        refetchUsers();
-                      }}
-                    >
-                      Delete
-                    </a>
                   </td>
                 </tr>
               ))}

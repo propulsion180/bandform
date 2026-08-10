@@ -9,6 +9,7 @@ import BandCreator from "./BandCreator";
 import Requests from "./Requests";
 import Profile from "./Profile";
 import Admin from "./Admin";
+import Monitoring from "./Monitoring";
 
 function BandDetailRoute() {
   const { id } = useParams<{ id: string }>();
@@ -34,6 +35,7 @@ export default function MobileApp() {
         </Route>
         <Route element={<ProtectedRoute adminOnly />}>
           <Route path="/admin" element={<Admin />} />
+          <Route path="/monitoring" element={<Monitoring />} />
         </Route>
       </Routes>
     </>

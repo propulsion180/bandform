@@ -6,14 +6,14 @@ export default function Landing() {
 
   return (
     <div className="page">
-      <div className="card" style={{ textAlign: "center", padding: "var(--space-6)" }}>
+      <div className="card hero">
         <h1>Find your band. Or build one.</h1>
-        <p className="section-title" style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>
+        <p style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>
           Bandform matches musicians by instrument, genre, and location --
           browse bands looking for members, or let us auto-assemble a band
           around the sound you're going for.
         </p>
-        <div className="navButtonContainer" style={{ justifyContent: "center" }}>
+        <div className="hero-actions">
           <a className="small-button" onClick={() => navigate("/signup")}>
             Sign up
           </a>

@@ -11,6 +11,7 @@ import Requests from "./Requests";
 import Profile from "./Profile";
 import BandCreator from "./BandCreator";
 import Admin from "./Admin";
+import Monitoring from "./Monitoring";
 import BandDetail from "./BandDetail";
 
 const DASHBOARD_WIDGET_Y = 96;
@@ -27,6 +28,7 @@ const WINDOW_SIZES: Record<WindowKind, { width: number; height: number }> = {
   profile: { width: 480, height: 560 },
   "create-band": { width: 480, height: 560 },
   admin: { width: 640, height: 520 },
+  monitoring: { width: 720, height: 620 },
   "band-detail": { width: 600, height: 640 },
 };
 
@@ -36,6 +38,7 @@ const WINDOW_TITLES: Record<WindowKind, string> = {
   profile: "Your profile",
   "create-band": "Create a band",
   admin: "Admin",
+  monitoring: "Monitoring",
   "band-detail": "Band",
 };
 
@@ -45,6 +48,7 @@ const PATH_TO_WINDOW: { pattern: RegExp; toWindow: (match: RegExpMatchArray) => 
   { pattern: /^\/profile$/, toWindow: () => ({ id: "profile", kind: "profile" }) },
   { pattern: /^\/create-band$/, toWindow: () => ({ id: "create-band", kind: "create-band" }) },
   { pattern: /^\/admin$/, toWindow: () => ({ id: "admin", kind: "admin" }) },
+  { pattern: /^\/monitoring$/, toWindow: () => ({ id: "monitoring", kind: "monitoring" }) },
   {
     pattern: /^\/band\/([^/]+)$/,
     toWindow: (match) => ({ id: `band-detail:${match[1]}`, kind: "band-detail", bandId: match[1] }),
@@ -64,7 +68,7 @@ export default function Desktop() {
       const match = location.pathname.match(pattern);
       if (!match) continue;
       const win = toWindow(match);
-      if (win.kind === "admin" && !isAdmin) {
+      if ((win.kind === "admin" || win.kind === "monitoring") && !isAdmin) {
         navigate("/", { replace: true });
         return;
       }
@@ -124,6 +128,7 @@ export default function Desktop() {
               {win.kind === "profile" && <Profile />}
               {win.kind === "create-band" && <BandCreator />}
               {win.kind === "admin" && <Admin />}
+              {win.kind === "monitoring" && <Monitoring />}
               {win.kind === "band-detail" && win.bandId && <BandDetail bandId={win.bandId} />}
             </WindowFrame>
           );

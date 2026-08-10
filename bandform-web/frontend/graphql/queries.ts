@@ -116,3 +116,51 @@ export const GET_ADMIN_BANDS = graphql(`
     }
   }
 `);
+
+export const SYSTEM_METRICS = graphql(`
+  query SystemMetrics {
+    systemMetrics {
+      systemCpuLoad
+      processCpuLoad
+      availableProcessors
+      systemMemoryTotal
+      systemMemoryFree
+      heapUsed
+      heapMax
+      nonHeapUsed
+      threadCount
+      peakThreadCount
+      daemonThreadCount
+      gcCount
+      gcTimeMs
+      uptimeMs
+      startTime
+      diskTotal
+      diskFree
+      dbReachable
+      dbPoolActive
+      dbPoolIdle
+      dbPoolPending
+      dbPoolTotal
+      dbPoolMax
+      graphqlRequests
+      graphqlErrors
+      graphqlAvgLatencyMs
+      totalUsers
+      totalBands
+      openPositions
+      pendingJoinRequests
+      totalMessages
+      activeSessions
+      lockedAccounts
+      usersWithFailedLogins
+      recentLogins {
+        userId
+        name
+        ip
+        country
+        at
+      }
+    }
+  }
+`);

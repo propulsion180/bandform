@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toList;
 
 
 public interface BandPositionRepository extends JpaRepository<BandPosition, Long>{
+    long countByFilledFalse();
     Optional<List<BandPosition>> findByBandId(Long band_id);
 }
 
