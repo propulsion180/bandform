@@ -29,6 +29,7 @@ Spring Boot 4.0.3, Java 21, GraphQL over HTTP + WebSocket.
   FRONTEND_ORIGIN=https://bandform.example java -jar target/*.jar
   ```
 
+
 ### `bandform-web` — web frontend (`:3000` in dev, static in prod)
 React 19 + TypeScript, bundled by esbuild, GraphQL types generated with graphql-codegen.
 
