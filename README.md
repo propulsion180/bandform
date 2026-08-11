@@ -8,6 +8,8 @@ The repo holds three components. The **server-side deployment is just the backen
 both clients of the backend's GraphQL API. Production specifics (Docker Postgres, reverse-proxy
 config, full env table) are in [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
+
+
 ### `bandform-backend` — API server (`:8080`)
 Spring Boot 4.0.3, Java 21, GraphQL over HTTP + WebSocket.
 
