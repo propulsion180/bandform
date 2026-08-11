@@ -44,7 +44,7 @@ React 19 + TypeScript, bundled by esbuild, GraphQL types generated with graphql-
   ```
 - **Build (prod — same-origin reverse proxy):**
   ```bash
-  BF_API_ORIGIN= pnpm build     # empty -> relative API URLs; static output under gallery-server/public/
+  BF_API_ORIGIN= pnpm build     # empty -> relative API URLs; static output under dist/
   ```
   Serve the built assets and `index.html` behind the reverse proxy (SPA fallback + `/graphql*`
   proxied to `:8080`). To host the backend on a different domain instead, build with

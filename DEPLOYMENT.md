@@ -64,7 +64,7 @@ the WebSocket scheme follows the page protocol (`wss://` under HTTPS).
 ```bash
 cd bandform-web
 pnpm install
-BF_API_ORIGIN= pnpm build          # output in gallery-server/public/
+BF_API_ORIGIN= pnpm build          # output in dist/
 ```
 Serve the built files as the site root. (If you ever host the backend on a *different* domain,
 build with `BF_API_ORIGIN=https://api.example.com` instead and switch the backend to a

@@ -1,12 +1,22 @@
 const esbuild = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
+const fs = require("fs");
 
 const isServe = process.argv.includes("--serve");
+const OUTDIR = "dist";
+
+// Copy the HTML entry into the build output so `dist/` is a self-contained,
+// deployable folder (index.html + bundle). The reverse proxy serves `dist/`
+// as the site root, so index.html references the bundle at /main.js|/main.css.
+function copyIndexHtml() {
+  fs.mkdirSync(OUTDIR, { recursive: true });
+  fs.copyFileSync("index.html", `${OUTDIR}/index.html`);
+}
 
 async function main() {
   const ctx = await esbuild.context({
     entryPoints: ["frontend/main.tsx"],
-    outdir: "gallery-server/public/",
+    outdir: `${OUTDIR}/`,
     bundle: true,
     minify: !isServe,
     sourcemap: isServe,
@@ -21,12 +31,14 @@ async function main() {
     plugins: [sassPlugin()],
   });
 
+  copyIndexHtml();
+
   if (isServe) {
-    // `fallback` serves index.html for any request that doesn't match a real
-    // file, so refreshing/deep-linking a client-side route (e.g. /login) loads
-    // the app instead of 404ing (BrowserRouter then renders the route). The
-    // bundle is referenced by absolute path in index.html, so it still resolves.
-    const { port } = await ctx.serve({ servedir: ".", fallback: "index.html", port: 3000, host: "localhost" });
+    // Serve `dist/` as the site root. `fallback` serves index.html for any
+    // request that doesn't match a real file, so refreshing/deep-linking a
+    // client-side route (e.g. /login) loads the app instead of 404ing
+    // (BrowserRouter then renders the route).
+    const { port } = await ctx.serve({ servedir: OUTDIR, fallback: "index.html", port: 3000, host: "localhost" });
     console.log(`⚡ Dev server running at http://localhost:${port} ⚡`);
   } else {
     await ctx.rebuild();
