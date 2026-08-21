@@ -30,6 +30,10 @@ Spring Boot 4.0.3, Java 21, GraphQL over HTTP + WebSocket.
   DB_HOST=localhost DB_PORT=5432 DB_NAME=bandform DB_USER=bandform DB_PASSWORD=<pw> \
   FRONTEND_ORIGIN=https://bandform.example java -jar target/*.jar
   ```
+- **Test:** `JAVA_HOME=/path/to/jdk-21 ./mvnw test` — runs the JUnit unit tests
+  (password policy, JWT, ranking, user-service rules) and the full-context GraphQL
+  integration tests (`*IT`: login/lockout, authorization gates, error mapping) against
+  an in-memory H2 database. No env vars needed (a test-only secret is baked in).
 
 
 ### `bandform-web` — web frontend (`:3000` in dev, static in prod)
@@ -52,6 +56,13 @@ React 19 + TypeScript, bundled by esbuild, GraphQL types generated with graphql-
   Serve the built assets and `index.html` behind the reverse proxy (SPA fallback + `/graphql*`
   proxied to `:8080`). To host the backend on a different domain instead, build with
   `BF_API_ORIGIN=https://api.example.com`.
+- **Test:**
+  ```bash
+  pnpm test          # Vitest unit + component tests (validation, layout, ProtectedRoute, Login, Signup)
+  pnpm e2e           # Playwright end-to-end (needs the backend running on :8080 with the dev seeder)
+  ```
+  The e2e suite auto-starts the dev server and signs in with the seeded dev accounts
+  (`Nora Normal` / `Alex Admin`, password `Password123`).
 
 ### `bandform-android` — mobile client (not deployed to the server)
 An Android GraphQL client of the backend, built to an APK and installed on a device.

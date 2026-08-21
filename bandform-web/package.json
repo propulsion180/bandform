@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test",
     "dev": "graphql-codegen && node esbuild.js --serve",
     "build": "graphql-codegen && node esbuild.js",
     "typecheck": "tsc --noEmit"
@@ -26,11 +28,18 @@
     "@graphql-codegen/cli": "^7.2.0",
     "@graphql-codegen/client-preset": "^6.1.0",
     "@graphql-typed-document-node/core": "^3.2.0",
+    "@playwright/test": "^1.48.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "esbuild": "^0.25.3",
     "esbuild-sass-plugin": "^3.3.1",
+    "jsdom": "^25.0.1",
     "sass": "^1.87.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
   }
 }
